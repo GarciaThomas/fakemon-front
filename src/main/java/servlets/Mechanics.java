@@ -47,8 +47,7 @@ public class Mechanics extends HttpServlet {
 			case "starterLoad":
 				StringBuffer startersJson = new StringBuffer();
 				ArrayList<String> monstresJson = new ArrayList<String>();
-				Player.getInstance()
-					.getStarters()
+				Player.getInstance().getStarters()
 					.forEach(m -> monstresJson.add("{\"nom\": \""+m.getNom()+"\",\"event\":{}}"));
 				sb.append("\"starters\" : ["+String.join(",",monstresJson)+"]");
 				sb.append(",\"nogo\":{}");

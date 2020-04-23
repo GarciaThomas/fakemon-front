@@ -55,7 +55,6 @@ function sendCombatBot(){
 			pvPlayMonPrg = rep.pvAtk/${sessionScope.attaquant.PVmax}*100
 			pvBarPlayMon.css("width",pvPlayMonPrg+"%")
 			pvBarPlayMon.text(rep.pvAtk+" / "+${sessionScope.attaquant.PVmax})
-			
 			hasMsg(rep.msg)
 			isFightEnded(rep.endFight)
 			hasPlayed(rep.playerTurn, rep.endFight)
