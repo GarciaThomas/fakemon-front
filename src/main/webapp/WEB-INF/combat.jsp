@@ -19,6 +19,7 @@ $(document).ready(function(){
 });
 
 function hasPlayed(playerTurn, finCombat){
+	console.log("in hasPlayed")
 	console.log(playerTurn)
 	console.log(finCombat)
 	if(!playerTurn){
@@ -52,26 +53,28 @@ function sendCombatBot(){
 			console.log("bot")
 			console.log(rep)
 			pvBarPlayMon = $("#progressPlayMon")
-			pvPlayMonPrg = rep.pvAtk/${sessionScope.attaquant.PVmax}*100
+			pvPlayMonPrg = rep.pvAtk/rep.pvMaxAtk*100
 			pvBarPlayMon.css("width",pvPlayMonPrg+"%")
-			pvBarPlayMon.text(rep.pvAtk+" / "+${sessionScope.attaquant.PVmax})
+			pvBarPlayMon.text(rep.pvAtk+" / "+rep.pvMaxAtk)
 			hasMsg(rep.msg)
 			isFightEnded(rep.endFight)
 			hasPlayed(rep.playerTurn, rep.endFight)
-			//window.location.href='${pageContext.request.contextPath}/actioncombat'
 		}
 		
 	})
 }
 
 function hasMsg(msg){
-	//msg = "${sessionScope.msg}"
-	
+	console.log("in hasMsg")
+	console.log(msg)
 	if( msg != "null"){
+		console.log("msg not null")
 		$("#encartMsgPlace").text(msg)
-		$("#encartMsg").css("display","bloc")
+		$("#encartMsg").css("display","block")
+		console.log($("#encartMsg").css("display"))
 		
 	}else{
+		console.log("msg null")
 		$("#encartMsg").css("display","none")
 	}
 	
@@ -87,8 +90,9 @@ function isFightEnded(endFight){
 }
 
 function moveToIndex(){
-	window.location.href="${pageContext.request.contextPath}/"
+	window.location.href="${pageContext.request.contextPath}/gamescene"
 }
+
 function sendCombat(atkId){
 	
 	$.ajax({
@@ -99,16 +103,16 @@ function sendCombat(atkId){
 		success: function(response){
 			console.log("player")
 			rep = JSON.parse(response)
+			console.log("Player")
 			console.log(rep)
 			pvBarAdvMon = $("#progressAdv")
-			pvBarMonAdvVal = rep.pvAdv/${sessionScope.adversaire.PVmax}*100
-			console.log(pvBarMonAdvVal)
+			pvBarMonAdvVal = rep.pvAdv/rep.pvMaxAdv*100
 			pvBarAdvMon.css("width",pvBarMonAdvVal+"%")
-			pvBarAdvMon.text(rep.pvAdv+" / "+${sessionScope.adversaire.PVmax})
+			pvBarAdvMon.text(rep.pvAdv+" / "+rep.pvMaxAdv)
 			
 			hasMsg(rep.msg)
 			isFightEnded(rep.endFight)
-			hasPlayed(rep.playerTurn,rep.endFIght)
+			hasPlayed(rep.playerTurn,rep.endFight)
 		}
 		
 	})

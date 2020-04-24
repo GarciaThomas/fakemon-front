@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.Context;
 import model.Monster;
+import model.Player;
 import model.creature.Crameleon;
 import model.creature.Pipeau;
 
@@ -33,6 +34,8 @@ public class SelectionMonstres extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		Player.getInstance().setPosition(new int[] {Integer.valueOf(request.getParameter("lastX")),Integer.valueOf(request.getParameter("lastY"))});
 		Context.getInstance().rebuildPropositions();
 		request.setAttribute("monstres", Context.getInstance().getMonstresProposition());
 		request.getServletContext().getRequestDispatcher("/WEB-INF/selectMonster.jsp").forward(request, response);

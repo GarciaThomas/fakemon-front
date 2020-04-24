@@ -8,10 +8,10 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 $(document).ready(
+		
 		function(){
 			$("#listSelect").children().hover(
 					function(){
-						//$(this).css("border","darkgrey solid 2px")
 						$(this).css("box-shadow","black 2px 2px")
 					},
 					function(){
@@ -43,7 +43,8 @@ function versCombat(idx){
 
 	<div class="container">
 		<div class="row h-100 align-items-center justify-content-around">
-			<div class="col-4 text-center" style="background-color:#eaeaea;padding:5px; border-radius:5px;border:black 2px solid">
+			<div class="col-6 text-center" style="background-color:#eaeaea;padding:5px; border-radius:5px;border:black 2px solid">
+				<div id="testMsg">${data }</div>
 				<h5 class="font-mine" style="padding:4px;">Selectionne ton monstre</h5>
 				<ul id="listSelect" class="list-group">
 					<c:forEach items="${monstres}" var="m" varStatus="loop">

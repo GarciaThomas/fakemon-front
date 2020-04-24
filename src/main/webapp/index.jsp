@@ -54,6 +54,12 @@ $(document).ready(function(){
 	function versScene(){
 		$.ajax({
 			type:"POST",
+			url:'${pageContext.request.contextPath}/playerinterface',
+			data: {"opt" : "new"}
+		})	
+		
+		$.ajax({
+			type:"POST",
 			url:'${pageContext.request.contextPath}/gamescene',
 			success: function(){
 				window.location.href='${pageContext.request.contextPath}'+'/gamescene'
