@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.Context;
 import model.Monster;
+import model.Player;
 
 /**
  * Servlet implementation class SetupSession
@@ -33,8 +34,6 @@ public class SetupSession extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		System.out.println("the get setup");
-		System.out.println(request.getSession().getAttribute("adversaire"));
 		request.getServletContext().getRequestDispatcher("/WEB-INF/combat.jsp").forward(request, response);
 	}
 
@@ -43,15 +42,14 @@ public class SetupSession extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.getSession().invalidate();
-		System.out.println(request.getSession().isNew());
 		List<Monster> monstresPossibles = Context.getInstance()
 									.getMonstresProposition();
-		Monster choixJoueur = monstresPossibles.get(Integer.valueOf((String) request.getParameter("mstrId")));
+		Monster choixJoueur = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
 		monstresPossibles.remove(Integer.valueOf((String) request.getParameter("mstrId")).intValue());
 		Random r = new Random();
-		Monster adverse = monstresPossibles.get(r.nextInt(monstresPossibles.size()));
-		System.out.println(adverse);
-		request.getSession().setAttribute("endFight", false);
+		//adverse = monstresPossibles.get(r.nextInt(monstresPossibles.size()));
+		Monster adverse = Player.getInstance().rencontreSauvage();
+		/**/request.getSession().setAttribute("endFight", false);
 		request.getSession().setAttribute("attaquant", choixJoueur);
 		request.getSession().setAttribute("adversaire", adverse);
 		request.getSession().setAttribute("playerTurn", true);

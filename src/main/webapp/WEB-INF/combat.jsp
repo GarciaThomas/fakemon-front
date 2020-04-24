@@ -19,9 +19,6 @@ $(document).ready(function(){
 });
 
 function hasPlayed(playerTurn, finCombat){
-	console.log("in hasPlayed")
-	console.log(playerTurn)
-	console.log(finCombat)
 	if(!playerTurn){
 		$("#menuSelectAtk").find("button").each(function(){
 			$(this).prop("disabled",true)
@@ -103,16 +100,22 @@ function sendCombat(atkId){
 		success: function(response){
 			console.log("player")
 			rep = JSON.parse(response)
-			console.log("Player")
 			console.log(rep)
-			pvBarAdvMon = $("#progressAdv")
-			pvBarMonAdvVal = rep.pvAdv/rep.pvMaxAdv*100
-			pvBarAdvMon.css("width",pvBarMonAdvVal+"%")
-			pvBarAdvMon.text(rep.pvAdv+" / "+rep.pvMaxAdv)
-			
-			hasMsg(rep.msg)
-			isFightEnded(rep.endFight)
-			hasPlayed(rep.playerTurn,rep.endFight)
+			console.log("Player")
+			if(rep.status === "attaque"){
+				pvBarAdvMon = $("#progressAdv")
+				pvBarMonAdvVal = rep.pvAdv/rep.pvMaxAdv*100
+				pvBarAdvMon.css("width",pvBarMonAdvVal+"%")
+				pvBarAdvMon.text(rep.pvAdv+" / "+rep.pvMaxAdv)
+				
+				hasMsg(rep.msg)
+				isFightEnded(rep.endFight)
+				hasPlayed(rep.playerTurn,rep.endFight)
+			}else if(rep.status === "capture"){
+				hasMsg(rep.msg)
+				isFightEnded(rep.endFight)
+				hasPlayed(rep.playerTurn,rep.endFight)
+			}
 		}
 		
 	})
@@ -214,6 +217,15 @@ function toasty(){
 								</div>
 								
 							</c:forEach>
+								<div class="row">
+									<div class="col-4" >
+										<button class="btn btn-link text-dark" 
+											data-toggle="collapse" 
+											data-target="#captureCol" 
+											onclick="sendCombat(100)">Capture</button>
+									</div>
+									<div class="col text-left">puissance : ${a.puissance} [${a.type}]</div>
+								</div>
 						</div>
 					</div>
 				</div>

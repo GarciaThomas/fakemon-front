@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,10 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import model.Context;
-import model.Monster;
 import model.Player;
-import model.creature.Crameleon;
-import model.creature.Pipeau;
 
 /**
  * Servlet implementation class SelectionMonstres
@@ -34,10 +30,14 @@ public class SelectionMonstres extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+	
 		Player.getInstance().setPosition(new int[] {Integer.valueOf(request.getParameter("lastX")),Integer.valueOf(request.getParameter("lastY"))});
 		Context.getInstance().rebuildPropositions();
-		request.setAttribute("monstres", Context.getInstance().getMonstresProposition());
+		if(Player.getInstance().getEquipePlayer().size() == 0)
+			Player.getInstance().addEquipePlayer(Context.getInstance().getMonstresProposition().get(0));
+		System.out.println("Equipe Joueur");
+		Player.getInstance().getEquipePlayer().forEach(System.out::println);
+		request.setAttribute("monstres", Player.getInstance().getEquipePlayer());
 		request.getServletContext().getRequestDispatcher("/WEB-INF/selectMonster.jsp").forward(request, response);
 	}
 

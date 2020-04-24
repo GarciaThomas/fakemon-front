@@ -15,44 +15,47 @@ $(document).ready(function(){
 	* @param e event lorsque la touche est relachee
 	*/
 	$(document).keyup(function(e){
-		
-		avatar = $("#avatar")
-		posY = parseInt(avatar.attr("posY"))
-		posX = parseInt(avatar.attr("posX"))
-		if(e.keyCode == 38){
-			//haut
-			actualY = (posY-1)*tailleCase
-			if(checkWalk(posX,posY-1)){
-				avatar.css("top",actualY+"px")
-				avatar.attr("posY",posY-1)
+		if(e.keyCode == 27){
+			console.log("Prochain emplacement menu")
+		}else{
+			avatar = $("#avatar")
+			posY = parseInt(avatar.attr("posY"))
+			posX = parseInt(avatar.attr("posX"))
+			if(e.keyCode == 38){
+				//haut
+				actualY = (posY-1)*tailleCase
+				if(checkWalk(posX,posY-1)){
+					avatar.css("top",actualY+"px")
+					avatar.attr("posY",posY-1)
+				}
+			}else if(e.keyCode==40){
+				//bas
+				actualY = (posY+1)*tailleCase
+				if(checkWalk(posX,posY+1)){
+					avatar.css("top",actualY+"px")
+					avatar.attr("posY",posY+1)
+				}
+			}else if(e.keyCode == 39){
+				//droite
+				
+				newX = (posX+1) * tailleCase
+				if(checkWalk(posX+1,posY)){
+					avatar.css("left",newX+"px")
+					avatar.attr("posX",posX+1)
+				}
+			}else if(e.keyCode == 37){
+				//gauche
+				newX=(posX-1) * tailleCase
+				if(checkWalk(posX-1,posY)){
+					avatar.css("left",newX+"px")
+					avatar.attr("posX",posX-1)
+				}
 			}
-		}else if(e.keyCode==40){
-			//bas
-			actualY = (posY+1)*tailleCase
-			if(checkWalk(posX,posY+1)){
-				avatar.css("top",actualY+"px")
-				avatar.attr("posY",posY+1)
-			}
-		}else if(e.keyCode == 39){
-			//droite
-			
-			newX = (posX+1) * tailleCase
-			if(checkWalk(posX+1,posY)){
-				avatar.css("left",newX+"px")
-				avatar.attr("posX",posX+1)
-			}
-		}else if(e.keyCode == 37){
-			//gauche
-			newX=(posX-1) * tailleCase
-			if(checkWalk(posX-1,posY)){
-				avatar.css("left",newX+"px")
-				avatar.attr("posX",posX-1)
-			}
+			posY = parseInt(avatar.attr("posY"))
+			posX = parseInt(avatar.attr("posX"))
+			checkEncounter(posX,posY)
+			checkTrigger(posX,posY)
 		}
-		posY = parseInt(avatar.attr("posY"))
-		posX = parseInt(avatar.attr("posX"))
-		checkEncounter(posX,posY)
-		checkTrigger(posX,posY)
 	})
 	
 	function avatarPosition(x,y){
@@ -73,7 +76,6 @@ $(document).ready(function(){
 		encounterY = ${encounter.y}
 		posY = parseInt(avatar.attr("posY"))
 		posX = parseInt(avatar.attr("posX"))
-		console.log({lastY: posY,lastX: posX,status:"passe"})
 		if(encounterX == x && encounterY == y){
 			$.ajax({
 				type:"POST",
@@ -82,7 +84,6 @@ $(document).ready(function(){
 				data : {"lastY": posY,"lastX": posX,"status":"passe"},
 				success: function(resp){
 					$("#scene").html(resp)
-					//window.location.href='${pageContext.request.contextPath}'+'/selection'
 				}
 			})
 		}
