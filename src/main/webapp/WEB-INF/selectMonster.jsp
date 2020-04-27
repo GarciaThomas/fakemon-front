@@ -32,8 +32,9 @@ function versCombat(idx){
 		type:"POST",
 		url:'${pageContext.request.contextPath}/setupsession',
 		data:{'mstrId' : idx,'playerPlays':true},
-		success: function(){
-			window.location.href='${pageContext.request.contextPath}/setupsession'
+		success: function(resp){
+			
+			//window.location.href='${pageContext.request.contextPath}/setupsession'
 		}
 	});
 }

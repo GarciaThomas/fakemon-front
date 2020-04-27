@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+
 import model.Context;
 import model.Player;
 
@@ -37,8 +39,14 @@ public class SelectionMonstres extends HttpServlet {
 			Player.getInstance().addEquipePlayer(Context.getInstance().getMonstresProposition().get(0));
 		System.out.println("Equipe Joueur");
 		Player.getInstance().getEquipePlayer().forEach(System.out::println);
-		request.setAttribute("monstres", Player.getInstance().getEquipePlayer());
-		request.getServletContext().getRequestDispatcher("/WEB-INF/selectMonster.jsp").forward(request, response);
+		if(request.getParameter("status").equals("passe")) {
+			request.setAttribute("monstres", Player.getInstance().getEquipePlayer());
+			request.getServletContext().getRequestDispatcher("/WEB-INF/selectMonster.jsp").forward(request, response);
+		}else if(request.getParameter("status").equals("passeList")) {
+			Gson gson = new Gson();
+			String s = gson.toJson(Player.getInstance().getEquipePlayer());
+			response.getWriter().write(s);
+		}
 	}
 
 	/**

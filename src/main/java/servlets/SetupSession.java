@@ -53,6 +53,9 @@ public class SetupSession extends HttpServlet {
 		request.getSession().setAttribute("attaquant", choixJoueur);
 		request.getSession().setAttribute("adversaire", adverse);
 		request.getSession().setAttribute("playerTurn", true);
+		
+		System.out.println("Passe dans le setup Session");
+		
 		doGet(request, response);
 	}
 
