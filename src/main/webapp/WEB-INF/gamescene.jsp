@@ -10,6 +10,8 @@
 $(document).ready(function(){
 	updatePlayer()
 	var tailleCase = 40
+	var scene = {}
+	sceneSetup()
 	/**
 	* Gestion des mouvements dans la scene
 	* @param e event lorsque la touche est relachee
@@ -72,21 +74,58 @@ $(document).ready(function(){
 	*	@param x,y int,int position sur la grille
 	*/
 	function checkEncounter(x,y){
-		encounterX = ${encounter.x}
-		encounterY = ${encounter.y}
+		encounterX = scene.encounter.x
+		encounterY = scene.encounter.y
 		posY = parseInt(avatar.attr("posY"))
 		posX = parseInt(avatar.attr("posX"))
 		if(encounterX == x && encounterY == y){
-			$.ajax({
+			/*$.ajax({
 				type:"POST",
 				url:'${pageContext.request.contextPath}/selection',
-				//data:"newSession="+true,
 				data : {"lastY": posY,"lastX": posX,"status":"passe"},
 				success: function(resp){
 					$("#scene").html(resp)
 				}
-			})
+			})*/
+			selectMonsterMenu();
 		}
+	}
+	
+	function selectMonsterMenu(){
+		$.ajax({
+			type:"POST",
+			url:'${pageContext.request.contextPath}/selection',
+			data : {"lastY": posY,"lastX": posX,"status":"passeList"},
+			success: function(resp){
+				data = JSON.parse(resp)
+				$("#select").css("display","block")
+				$("#scene").css("display","none")
+				$.each(data,function(index,val){
+					let elem = $("<li></li>")
+					elem.addClass("font-mine list-group-item")
+					elem.css({"box-shadow":"#eaeaea 2px 4px","margin-bottom":"2px"})
+					elem.text(val.nom)
+					elem.click({param1:index},combat)
+					$("#listSelect").append(elem)
+					
+				})				
+			}
+		})
+	}
+	
+	function combat(event){
+		idx = event.data.param1
+		$.ajax({
+			type:"POST",
+			url:'${pageContext.request.contextPath}/setupsession',
+			data:{'mstrId' : idx,'playerPlays':true},
+			success: function(resp){
+				$("#scene").html(resp)
+				$("#scene").css("display","block")
+				$("#select").css("display","none")
+			}
+		});
+		
 	}
 	
 	/**
@@ -150,10 +189,23 @@ $(document).ready(function(){
 			}
 		})
 	}
+	
+	
+	function sceneSetup(){
+		$.ajax({
+			type:"POST",
+			url:'${pageContext.request.contextPath}/scenesetup',
+			success:function(resp){
+				console.log(resp)
+				data = JSON.parse(resp)
+				scene = data
+			}
+		});
+	}
+	
 });
 
 </script>
-
 </head>
 <body>
 	<div id="game" class="container">
@@ -169,6 +221,17 @@ $(document).ready(function(){
 						posX="0"
 						posY="0"
 					/>
+				</div>
+				<div class="container" id="select" style="display:none;position:relative;z-index:3">
+					<div class="row h-100 align-items-center justify-content-around">
+						<div class="col-6 text-center" style="background-color:#eaeaea;padding:5px; border-radius:5px;border:black 2px solid">
+							<div id="testMsg">${data }</div>
+							<h5 class="font-mine" style="padding:4px;">Selectionne ton monstre</h5>
+							<ul id="listSelect" class="list-group">
+								
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

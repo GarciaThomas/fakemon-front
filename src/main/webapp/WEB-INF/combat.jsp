@@ -128,8 +128,8 @@ function toasty(){
 </script>
 <style>
 @keyframes toaster{
-	0%	{left:-360px}
-	100%	{left:0}
+	0%	{left:-100vw}
+	100%	{left:-15vw}
 }
 .toast-it{
 	animation-name:toaster;
@@ -139,13 +139,14 @@ function toasty(){
 </style>
 </head>
 <body>
-	<div class="container">
-	<img id="toastyJordan" style="position:absolute;left:-360px;bottom:0" src="${pageContext.request.contextPath}/assets/img/BJ.png"/>
-	<audio id="toastyAudio">
-		<source src='http://soundfxcenter.com/video-games/mortal-kombat-3-trilogy/8d82b5_Mortal_Kombat_3_Toasty_Sound_Effect.mp3' type="audio/mpeg"/>
-	</audio>
+	<div class="container" style="max-height:400px">
 		<div class="row h-100 align-items-center">
-			<div class="col-6" style="margin:0 auto; border:black 2px solid;background-color:#eaeaea">
+			<img id="toastyJordan" style="position:absolute;left:-100vw;bottom:-21vh;z-index:1" src="${pageContext.request.contextPath}/assets/img/BJ.png"/>
+			<audio id="toastyAudio">
+				<source src='http://soundfxcenter.com/video-games/mortal-kombat-3-trilogy/8d82b5_Mortal_Kombat_3_Toasty_Sound_Effect.mp3' type="audio/mpeg"/>
+			</audio>
+		
+			<div class="col" style="margin:0 auto; border:black 2px solid;background-color:#eaeaea">
 				<div class="row">
 					<!-- stat adverse -->
 					<div id="blocAdv" class="font-mine" style="width:100%;padding:10px">
@@ -172,7 +173,7 @@ function toasty(){
 					<img 
 						id="imgAdv" 
 						src="${pageContext.request.contextPath}/assets/img/monsters/1.png" 
-						height="100" 
+						height="25" 
 						style="transform: scaleX(-1)"
 					/>
 				</div>
@@ -180,7 +181,7 @@ function toasty(){
 					<img 
 						id="imgPlay" 
 						src="${pageContext.request.contextPath}/assets/img/monsters/2.png" 
-						height="100" 
+						height="25" 
 					/>
 				</div>
 				<div class="row border-black" id="encartMsg"  style="min-height:20px;border-radius:5px;margin: 5 10px 0 10px; box-shadow: 2px 2px">

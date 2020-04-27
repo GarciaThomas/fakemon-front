@@ -1,8 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
 import javax.servlet.ServletException;
@@ -14,16 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 import model.Player;
 
 /**
- * Servlet implementation class GameScene
+ * Servlet implementation class SetupScene
  */
-@WebServlet("/gamescene")
-public class GameScene extends HttpServlet {
+@WebServlet("/scenesetup")
+public class SetupScene extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GameScene() {
+    public SetupScene() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,38 +30,27 @@ public class GameScene extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HashMap encounterPos = new HashMap<String, Integer>();
-		
 		Random r = new Random();
-		encounterPos.put("x",r.nextInt(9));
-		encounterPos.put("y",r.nextInt(4)+5);
-		
-		
-		
-		String noPasaran = "{4:[0,1,2,3,4,5,6,7]}";
+	
+		String noPasaran = "{\"4\":[0,1,2,3,4,5,6,7]}";
 		
 		request.setAttribute("noWalk", noPasaran);
-		System.out.println("Joueur peut rencontrer "+Player.getInstance().peutRencontrer());
-		if(Player.getInstance().peutRencontrer()) {
-			request.setAttribute("encounter",encounterPos);
-		}
+
 		
 		StringBuffer sb = new StringBuffer();
 		
 		sb.append("{");
-		sb.append("\"noWalk\": ").append(noPasaran).append(",\"encounter\":").append(encounterPos);
+		sb.append("\"noWalk\": ").append(noPasaran).append(",\"encounter\":{\"x\":").append(r.nextInt(9)).append(",\"y\":").append(r.nextInt(4)+5).append("}");
 		sb.append("}");
 		
 		response.getWriter().write(sb.toString());
-		
-		this.getServletContext().getRequestDispatcher("/WEB-INF/gamescene.jsp").forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
