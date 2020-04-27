@@ -56,6 +56,10 @@ public class Mechanics extends HttpServlet {
 			case "starterSelected":
 				int index = Integer.valueOf((String) request.getAttribute("monsterSelected")).intValue();
 			break;
+			case "heal":
+				System.out.println("healing wounds");
+				Player.getInstance().soinEquipeJoueur();
+			break;
 		
 		}
 		sb.append("}");

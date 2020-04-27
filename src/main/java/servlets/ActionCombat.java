@@ -87,6 +87,8 @@ public class ActionCombat extends HttpServlet {
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				if(m1.getPV() > 0)
+					m1.getExpGain();
 				sb.append("\"playerTurn\":false,\"pvAdv\":"+m2.getPV()+",\"pvAtk\":"+m1.getPV()+",\"pvMaxAdv\" : "+m2.getPVmax()+",\"pvMaxAtk\" : "+m1.getPVmax());
 				sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
 				request.getSession().setAttribute("endFight", true);
@@ -105,6 +107,8 @@ public class ActionCombat extends HttpServlet {
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				if(m2.getPV() > 0)
+					m2.getExpGain();
 				sb.append("\"playerTurn\":true,\"pvAdv\":"+m1.getPV()+",\"pvAtk\":"+m2.getPV()+",\"pvMaxAdv\" : "+m1.getPVmax()+",\"pvMaxAtk\" : "+m2.getPVmax());
 				sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
 				

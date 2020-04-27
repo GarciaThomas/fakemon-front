@@ -102,10 +102,18 @@ $(document).ready(function(){
 				$("#scene").css("display","none")
 				$.each(data,function(index,val){
 					let elem = $("<li></li>")
-					elem.addClass("font-mine list-group-item")
+					elem.addClass("font-mine list-group-item btn btn-link")
 					elem.css({"box-shadow":"#eaeaea 2px 4px","margin-bottom":"2px"})
 					elem.text(val.nom)
-					elem.click({param1:index},combat)
+					
+					console.log(val.PV)
+					if(val.PV <= 0){
+						console.log("disabling")
+						
+						elem.prop("disabled","true")
+					}else{
+						elem.click({param1:index},combat)
+					}
 					$("#listSelect").append(elem)
 					
 				})				
@@ -203,6 +211,16 @@ $(document).ready(function(){
 		});
 	}
 	
+	btnHeal = $("#healBtn")
+	
+	function heal(){
+		$.ajax({
+			type:"POST",
+			url:'${pageContext.request.contextPath}/mechanics',
+			data:{"activity":"heal"}
+		})
+	}
+	btnHeal.click(heal)
 });
 
 </script>
@@ -210,6 +228,7 @@ $(document).ready(function(){
 <body>
 	<div id="game" class="container">
 		<div class="row h-100 justify-content-around align-items-center no-gutters">
+			<button class="btn" id="healBtn">heal</button>
 			<div class="col-4 p-0">
 				<div id="scene" style="width:404px;height:404px;border-radius:2px;border:black 2px solid;background-color:white;background-image:url('${pageContext.request.contextPath}/assets/img/fondScene.png');background-size:cover">
 					<img
