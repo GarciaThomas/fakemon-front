@@ -33,14 +33,13 @@ public class SelectionMonstres extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
-		Player.getInstance().setPosition(new int[] {Integer.valueOf(request.getParameter("lastX")),Integer.valueOf(request.getParameter("lastY"))});
+		
 		Context.getInstance().rebuildPropositions();
 		if(Player.getInstance().getEquipePlayer().size() == 0)
 			Player.getInstance().addEquipePlayer(Context.getInstance().getMonstresProposition().get(0));
-		System.out.println("Equipe Joueur");
-		Player.getInstance().getEquipePlayer().forEach(System.out::println);
+
+			Player.getInstance().getEquipePlayer().forEach(System.out::println);
 		if(request.getParameter("status").equals("passe")) {
-			request.setAttribute("monstres", Player.getInstance().getEquipePlayer());
 			request.getServletContext().getRequestDispatcher("/WEB-INF/selectMonster.jsp").forward(request, response);
 		}else if(request.getParameter("status").equals("passeList")) {
 			Gson gson = new Gson();

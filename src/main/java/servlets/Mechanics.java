@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+
+import model.Monster;
 import model.Player;
 
 /**
@@ -52,17 +55,29 @@ public class Mechanics extends HttpServlet {
 				sb.append("\"starters\" : ["+String.join(",",monstresJson)+"]");
 				sb.append(",\"nogo\":{}");
 				sb.append(",\"events\":[{\"type\":\"interact\",\"x\":2,\"y\":0}]");
-		    break;
+				break;
 			case "starterSelected":
 				int index = Integer.valueOf((String) request.getAttribute("monsterSelected")).intValue();
-			break;
+				break;
 			case "heal":
 				System.out.println("healing wounds");
 				Player.getInstance().soinEquipeJoueur();
-			break;
+				break;
+			case "updateInfos":
+				Player.getInstance().setPosition(new int[] {Integer.valueOf(request.getParameter("lastX")),Integer.valueOf(request.getParameter("lastY"))});
+				break;
+			case "monstersInfos":
+				System.out.println("infos des monstres en update");
+				Monster atk = (Monster)request.getSession().getAttribute("attaquant");
+				Monster adv = (Monster)request.getSession().getAttribute("adversaire");
+				Gson gson = new Gson();
+				sb.append("\"attaquant\" : ").append(gson.toJson(atk));
+				sb.append(",\"adversaire\" : ").append(gson.toJson(adv));
+				break;
 		
 		}
 		sb.append("}");
+		System.out.println(sb.toString());
 		response.getWriter().write(sb.toString());
 		//doGet(request, response);
 	}

@@ -78,46 +78,34 @@ $(document).ready(function(){
 		encounterY = scene.encounter.y
 		posY = parseInt(avatar.attr("posY"))
 		posX = parseInt(avatar.attr("posX"))
+		
 		if(encounterX == x && encounterY == y){
-			/*$.ajax({
-				type:"POST",
-				url:'${pageContext.request.contextPath}/selection',
-				data : {"lastY": posY,"lastX": posX,"status":"passe"},
-				success: function(resp){
-					$("#scene").html(resp)
-				}
-			})*/
+			updatePlayerInfos()
 			selectMonsterMenu();
 		}
 	}
 	
-	function selectMonsterMenu(){
+	function updatePlayerInfos(){
+		console.log("updating")
 		$.ajax({
+			type:'POST',
+			url:'${pageContext.request.contextPath}/mechanics',
+			data:{'activity':'updateInfos','lastY':parseInt($("#avatar").attr("posY")),'lastX':parseInt($("#avatar").attr("posX"))}
+		})
+	}
+	
+	function selectMonsterMenu(){
+		console.log("selecting")
+		$.ajax({
+			
 			type:"POST",
-			url:'${pageContext.request.contextPath}/selection',
-			data : {"lastY": posY,"lastX": posX,"status":"passeList"},
+			url:'${pageContext.request.contextPath}/actioncombat',
+			data:{'action':'switch','context':'select'},
 			success: function(resp){
-				data = JSON.parse(resp)
-				$("#select").css("display","block")
-				$("#scene").css("display","none")
-				$.each(data,function(index,val){
-					let elem = $("<li></li>")
-					elem.addClass("font-mine list-group-item btn btn-link")
-					elem.css({"box-shadow":"#eaeaea 2px 4px","margin-bottom":"2px"})
-					elem.text(val.nom)
-					
-					console.log(val.PV)
-					if(val.PV <= 0){
-						console.log("disabling")
-						
-						elem.prop("disabled","true")
-					}else{
-						elem.click({param1:index},combat)
-					}
-					$("#listSelect").append(elem)
-					
-				})				
+				console.log(resp)
+				$("#scene").html(resp)
 			}
+			
 		})
 	}
 	
@@ -125,7 +113,7 @@ $(document).ready(function(){
 		idx = event.data.param1
 		$.ajax({
 			type:"POST",
-			url:'${pageContext.request.contextPath}/setupsession',
+			url:'/fakemon-front/setupsession',
 			data:{'mstrId' : idx,'playerPlays':true},
 			success: function(resp){
 				$("#scene").html(resp)
@@ -186,7 +174,7 @@ $(document).ready(function(){
 		$.ajax({
 			type:"POST",
 			data: {"opt":"update"},
-			url:'${pageContext.request.contextPath}/playerinterface',
+			url:'/fakemon-front/playerinterface',
 			success: function(resp){
 				data = JSON.parse(resp)
 				console.log(data)
@@ -202,7 +190,7 @@ $(document).ready(function(){
 	function sceneSetup(){
 		$.ajax({
 			type:"POST",
-			url:'${pageContext.request.contextPath}/scenesetup',
+			url:'/fakemon-front/scenesetup',
 			success:function(resp){
 				console.log(resp)
 				data = JSON.parse(resp)
@@ -220,7 +208,6 @@ $(document).ready(function(){
 			data:{"activity":"heal"}
 		})
 	}
-	btnHeal.click(heal)
 });
 
 </script>
@@ -228,7 +215,6 @@ $(document).ready(function(){
 <body>
 	<div id="game" class="container">
 		<div class="row h-100 justify-content-around align-items-center no-gutters">
-			<button class="btn" id="healBtn">heal</button>
 			<div class="col-4 p-0">
 				<div id="scene" style="width:404px;height:404px;border-radius:2px;border:black 2px solid;background-color:white;background-image:url('${pageContext.request.contextPath}/assets/img/fondScene.png');background-size:cover">
 					<img
@@ -241,18 +227,6 @@ $(document).ready(function(){
 						posY="0"
 					/>
 				</div>
-				<div class="container" id="select" style="display:none;position:relative;z-index:3">
-					<div class="row h-100 align-items-center justify-content-around">
-						<div class="col-6 text-center" style="background-color:#eaeaea;padding:5px; border-radius:5px;border:black 2px solid">
-							<div id="testMsg">${data }</div>
-							<h5 class="font-mine" style="padding:4px;">Selectionne ton monstre</h5>
-							<ul id="listSelect" class="list-group">
-								
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </body>

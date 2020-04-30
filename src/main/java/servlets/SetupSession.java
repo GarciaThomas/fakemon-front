@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import model.Context;
 import model.Monster;
@@ -41,20 +42,43 @@ public class SetupSession extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getSession().invalidate();
-		List<Monster> monstresPossibles = Context.getInstance()
-									.getMonstresProposition();
-		Monster choixJoueur = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
-		monstresPossibles.remove(Integer.valueOf((String) request.getParameter("mstrId")).intValue());
-		Random r = new Random();
-		//adverse = monstresPossibles.get(r.nextInt(monstresPossibles.size()));
-		Monster adverse = Player.getInstance().rencontreSauvage();
-		/**/request.getSession().setAttribute("endFight", false);
-		request.getSession().setAttribute("attaquant", choixJoueur);
-		request.getSession().setAttribute("adversaire", adverse);
-		request.getSession().setAttribute("playerTurn", true);
-		
+
 		System.out.println("Passe dans le setup Session");
+		
+		HttpSession ses = request.getSession(false);
+		if(ses != null) {
+	
+			if(request.getSession().getAttribute("endFight") != null) {
+				Monster choixJoueur = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
+				request.getSession().setAttribute("attaquant", choixJoueur);
+			}else {
+				request.getSession().invalidate();
+				List<Monster> monstresPossibles = Context.getInstance()
+											.getMonstresProposition();
+				Monster choixJoueurNewCombat = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
+				monstresPossibles.remove(Integer.valueOf((String) request.getParameter("mstrId")).intValue());
+				Random r = new Random();
+				
+				Monster adverse = Player.getInstance().rencontreSauvage();
+				request.getSession().setAttribute("endFight", true);
+				request.getSession().setAttribute("attaquant", choixJoueurNewCombat);
+				request.getSession().setAttribute("adversaire", adverse);
+				request.getSession().setAttribute("playerTurn", true);					
+			}
+		}else {
+			request.getSession();
+			List<Monster> monstresPossibles = Context.getInstance()
+										.getMonstresProposition();
+			Monster choixJoueurNewCombat = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
+			monstresPossibles.remove(Integer.valueOf((String) request.getParameter("mstrId")).intValue());
+			Random r = new Random();
+			//adverse = monstresPossibles.get(r.nextInt(monstresPossibles.size()));
+			Monster adverse = Player.getInstance().rencontreSauvage();
+			/**/request.getSession().setAttribute("endFight", true);
+			request.getSession().setAttribute("attaquant", choixJoueurNewCombat);
+			request.getSession().setAttribute("adversaire", adverse);
+			request.getSession().setAttribute("playerTurn", true);	
+		}
 		
 		doGet(request, response);
 	}
