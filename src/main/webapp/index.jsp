@@ -7,6 +7,7 @@
 <title></title>
 <script type="text/javascript">
 $(document).ready(function(){
+	killSession();
 	// attribution des fonctions
 	$("#btnScene").click(versScene)
 	$("#btnContinuer").click(autofire)
@@ -52,6 +53,7 @@ $(document).ready(function(){
 	}
 	
 	function versScene(){
+		killSession()
 		$.ajax({
 			type:"POST",
 			url:'${pageContext.request.contextPath}/playerinterface',
@@ -67,7 +69,13 @@ $(document).ready(function(){
 		})		
 	}
 	
-	
+	function killSession(){
+		$.ajax({
+			type:'POST',
+			url:'/fakemon-front/mechanics',
+			data:{'activity':'killSession'}
+		})
+	}
 });
 </script>
 </head>

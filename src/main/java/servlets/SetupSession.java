@@ -46,9 +46,11 @@ public class SetupSession extends HttpServlet {
 		System.out.println("Passe dans le setup Session");
 		
 		HttpSession ses = request.getSession(false);
-		if(ses != null) {
-	
-			if(request.getSession().getAttribute("endFight") != null) {
+		System.out.println("nouveau ? "+ses.isNew());
+		if(request.getSession().getAttribute("endFight") != null) {
+			Boolean context = (Boolean) request.getSession().getAttribute("endFight");
+			System.out.println("Jai un context ?");
+			if(context) {
 				Monster choixJoueur = Player.getInstance().getEquipePlayer().get(Integer.valueOf((String) request.getParameter("mstrId")));
 				request.getSession().setAttribute("attaquant", choixJoueur);
 			}else {

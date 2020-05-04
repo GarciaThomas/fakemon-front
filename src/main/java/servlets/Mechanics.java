@@ -74,6 +74,9 @@ public class Mechanics extends HttpServlet {
 				sb.append("\"attaquant\" : ").append(gson.toJson(atk));
 				sb.append(",\"adversaire\" : ").append(gson.toJson(adv));
 				break;
+			case "killSession":
+				request.getSession().invalidate();
+				break;
 		
 		}
 		sb.append("}");
