@@ -12,7 +12,7 @@ import model.Player;
 /**
  * Servlet implementation class PlayerInterface
  */
-@WebServlet("/playerinterface")
+//@WebServlet("/playerinterface")
 public class PlayerInterface extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

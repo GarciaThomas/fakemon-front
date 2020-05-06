@@ -16,7 +16,7 @@ import model.Player;
 /**
  * Servlet implementation class SelectionMonstres
  */
-@WebServlet("/selection")
+//@WebServlet("/selection")
 public class SelectionMonstres extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

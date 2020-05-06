@@ -17,7 +17,7 @@ import model.Player;
 /**
  * Servlet implementation class ActionCombat
  */
-@WebServlet("/actioncombat")
+//@WebServlet("/actioncombat")
 public class ActionCombat extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

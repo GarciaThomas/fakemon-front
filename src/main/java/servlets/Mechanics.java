@@ -17,7 +17,7 @@ import model.Player;
 /**
  * Servlet implementation class Mechanics
  */
-@WebServlet("/mechanics")
+//@WebServlet("/mechanics")
 public class Mechanics extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

@@ -18,7 +18,7 @@ import model.Player;
 /**
  * Servlet implementation class SetupSession
  */
-@WebServlet("/setupsession")
+//@WebServlet("/setupsession")
 public class SetupSession extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

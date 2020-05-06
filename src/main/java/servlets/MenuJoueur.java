@@ -15,7 +15,7 @@ import model.Player;
 /**
  * Servlet implementation class MenuJoueur
  */
-@WebServlet("/menujoueur")
+//@WebServlet("/menujoueur")
 public class MenuJoueur extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

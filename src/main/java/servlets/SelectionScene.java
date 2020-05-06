@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class SelectionScene
  */
-@WebServlet("/selectionscene")
+//@WebServlet("/selectionscene")
 public class SelectionScene extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
