@@ -21,7 +21,9 @@ public class WebConfig implements WebMvcConfigurer{
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/assets/**");
 	} 
-
+	
+	//	ViewResolver pour le Spring-jsp
+	/*		
 	@Bean
 	public UrlBasedViewResolver viewResolver() {
 		UrlBasedViewResolver viewResolver = new UrlBasedViewResolver();
@@ -29,8 +31,7 @@ public class WebConfig implements WebMvcConfigurer{
 		//viewResolver.setPrefix("/WEB-INF/");
 		viewResolver.setSuffix(".jsp");
 		return viewResolver;
-	}
-
+	}*/
 
 
 	//les 3 Beans de fonctionnement de Thymeleaf :
@@ -53,6 +54,7 @@ public class WebConfig implements WebMvcConfigurer{
 		return templateEngine;
 	}
 
+	//	ViewResolver pour le Spring-Thymeleaf
 	@Bean
 	public ThymeleafViewResolver viewResolver(SpringTemplateEngine templateEngine) {
 		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
