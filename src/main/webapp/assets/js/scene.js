@@ -124,24 +124,15 @@ $(document).ready(function(){
 	}
 	
 	function checkTrigger(x,y){
-		/**
-		*	ToDo : trouver le moyen d'avoir une liste des triggers possible sur le setup et déclencher les bonnes fonctions
-		
-		
-		if(x == 3 && y == 3){
-			setupObj = {
-					background:"tileExt.png",
-					y:5,
-					x:9
+		console.log("trigger")
+		inter = scene.triggers.interact[0]
+		if(inter.pos[0] == x && inter.pos[1] == y){
+			if(inter.event_type == "move"){
+				console.log("ok")
+				updatePlayerInfos()
+				sceneSetup()
 			}
-			nextTile(setupObj)
 		}
-		
-		
-		trigger = scene.triggers.interact[0]
-		elem = $(trigger.html)
-		console.log(elem)
-		$("#scene").append(elem)*/
 		
 	}
 	
@@ -178,6 +169,8 @@ $(document).ready(function(){
 				data = JSON.parse(resp)
 				console.log(data)
 				scene = data
+				$("#scene").css("background-image","url("+scene.background+")")
+				$("#scene").css("background-color","none")
 			}
 		});
 		
@@ -185,13 +178,17 @@ $(document).ready(function(){
 			type:"GET",
 			url:'player/infosTest',
 			success:function(resp){
-				//console.log(resp)
 				data = JSON.parse(resp)
 				console.log(scene.id+" : "+data.idScene)
 				if(scene.id != data.idScene){
-					updatePlayerInfos
+					console.log("onUpdate boiii")
+					updatePlayerInfos()
+					posX = scene.startpos[0]
+					posY = scene.startpos[1]
+					avatarPosition(posX,posY)
 				}else{
-					updatePlayer()
+					console.log("moving boiii")
+					updatePlayerInfos()
 				}
 			}
 		});
