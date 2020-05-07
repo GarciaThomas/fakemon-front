@@ -20,7 +20,7 @@ public class MainController {
 	
 	@GetMapping("/scene")
 	public String toScene() {
-		return "/WEB-INF/gamescene";
+		return "gamescene";
 	}
 	
 }

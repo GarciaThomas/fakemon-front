@@ -29,7 +29,7 @@ public class GameMechanics {
 	@GetMapping("/select")
 	public String getSelectMenu() {
 		System.out.println("Go select");
-		return "/WEB-INF/selectMonster";
+		return "selectMonster";
 	}
 	
 }

@@ -44,10 +44,10 @@ public class Combat {
 		request.getSession().setAttribute("adversaire", player.rencontreSauvage());
 		
 		
-		return "/WEB-INF/combat";
+		return "combat";
 	}
 	
-	@PostMapping("/switch")
+	@PostMapping("switch")
 	@ResponseBody
 	public boolean switchMonster(@RequestParam String entity, @RequestParam int id, HttpServletRequest request) {
 		
