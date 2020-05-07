@@ -20,15 +20,15 @@ import dao.IDAOMonster;
 import model.Action;
 import model.Monster;
 import model.PVException;
-import model.Player;
 import service.ContextService;
+import service.PlayerService;
 
 @Controller
 @RequestMapping("/combat")
 public class Combat {
 
 	@Autowired
-	Player player;
+	PlayerService player;
 	@Autowired
 	ContextService ctx;
 	
@@ -52,7 +52,7 @@ public class Combat {
 	public boolean switchMonster(@RequestParam String entity, @RequestParam int id, HttpServletRequest request) {
 		
 		if(entity.contentEquals("player")) {
-			Monster m = player.getEquipePlayer().parallelStream().filter(mon -> mon.getId() == id).findFirst().get();
+			Monster m = player.getEquipePlayer()./*parallelStream().filter(mon -> mon.getId() == id).find*/getFirst()/*.get()*/;
 			System.out.println("LE MONSTRE : "+m);
 			request.getSession().setAttribute("attaquant", m);
 		}
@@ -126,7 +126,7 @@ public class Combat {
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				if(m1.getPv() > 0)
+				if(m1.getPV() > 0)
 					m1.getExpGain();
 				player.soinEquipeJoueur();
 				sb.append("\"playerTurn\":false");
@@ -169,13 +169,13 @@ public class Combat {
 				int atkId = m1.choixAttaqueBOT(m2,ctx).getId();
 				Action act = m1.combat(m2,atkId,ctx);
 				m2 = act.getM();
-				act.append(m2.getPv()+" restant");
+				act.append(m2.getPV()+" restant");
 				sb.append("\"playerTurn\":true");
 				sb.append(",\"endFight\":"+false+",\"msg\": \""+act.getMessage()+"\"");
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				if(m1.getPv() > 0)
+				if(m1.getPV() > 0)
 					m1.getExpGain();
 				player.soinEquipeJoueur();
 				sb.append("\"playerTurn\":true");

@@ -1,7 +1,5 @@
 package controller;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,17 +11,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import model.Player;
+import service.PlayerService;
 @Controller
 @RequestMapping("/player")
 public class PlayerMechanics {
 	@Autowired
-	Player player;
+	PlayerService player;
 	
 	@PostMapping("/posupdate")
 	@ResponseBody
 	public boolean playerInfos(@RequestParam int x, @RequestParam int y, @RequestParam int scene) {
-		player.setIdScene(scene);
+//		player.setIdScene(scene);
 		player.setPosition(new int[]{x,y});
 		return true;
 	}

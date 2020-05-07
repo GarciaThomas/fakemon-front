@@ -19,7 +19,7 @@
 		
 		<init-param>
 			<param-name>contextConfigLocation</param-name> 
-			<param-value>config.fakemonConfig</param-value> 
+			<param-value>config.FakemonConfig</param-value> 
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>	
