@@ -42,9 +42,9 @@
 							<div class="progress-bar progress-bar-striped bg-danger progress-bar-animated" 
 								role="progressbar" 
 								id="progressAdv"
-								aria-now="${sessionScope.adversaire.PV}"
+								aria-now="${sessionScope.adversaire.pv}"
 								aria-min="0"
-								aria-max="${sessionScope.adversaire.PVmax}"
+								aria-max="${sessionScope.adversaire.pvMax}"
 								>
 								
 							</div>
@@ -54,7 +54,7 @@
 				<div class="row justify-content-end">
 					<img 
 						id="imgAdv" 
-						src="${pageContext.request.contextPath}/assets/img/monsters/1.png" 
+						src="assets/img/monsters/1.png" 
 						height="25" 
 						style="transform: scaleX(-1)"
 					/>
@@ -62,7 +62,7 @@
 				<div class="row">
 					<img 
 						id="imgPlay" 
-						src="${pageContext.request.contextPath}/assets/img/monsters/2.png" 
+						src="assets/img/monsters/2.png" 
 						height="25" 
 					/>
 				</div>
@@ -73,46 +73,29 @@
 					<!--  nos stat + actions -->
 					
 					<div id="menu_actions"  class="font-mine w-100" style="padding:10px">
-						<h4>${sessionScope.attaquant.nom}</h4>
-						<h5>lvl : ${sessionScope.attaquant.level}</h5>
+						<h4 id="nomAttaquant"></h4>
+						<h5 id="lvlAttaquant"></h5>
 						<div class="row" style="margin-left:20px;">
 							<div class="progress" style="width:40%; border:black solid 2px">
 								<div class="progress-bar" 
 										role="progressbar" 
 										id="progressPlayMon"
-										aria-now="${sessionScope.attaquant.PV}"
 										aria-min="0"
-										aria-max="${sessionScope.attaquant.PVmax}"
 								>
 								</div>
 								
 							</div>
 							<span id="xp"></span>
-							<button class="btn" onclick="switchMonster()">switch</button>
+							<button class="btn" onclick="listSwitch()">switch</button>
+							<button class="btn btn-link text-dark" 
+											data-toggle="collapse" 
+											data-target="#captureCol" 
+											onclick="capture()">Capture	
+							</button>
 						</div>
 						
 						<div id="menuSelectAtk" style="border-left:1px solid black;border-top: black 1px solid;border-radius:5px;margin-top:2px; box-shadow: 2px 2px">
-							<c:forEach items="${sessionScope.attaquant.listAttaque}" var="a">
-								<div class="row">
-									<div class="col-4" >
-										<button class="btn btn-link text-dark" 
-											data-toggle="collapse" 
-											data-target="#${a.nom}Col" 
-											onclick="sendCombat(${a.id})">${a.nom}</button>
-									</div>
-									<div class="col text-left">puissance : ${a.puissance} [${a.type}]</div>
-								</div>
-								
-							</c:forEach>
-								<div class="row">
-									<div class="col-4" >
-										<button class="btn btn-link text-dark" 
-											data-toggle="collapse" 
-											data-target="#captureCol" 
-											onclick="capture()">Capture</button>
-									</div>
-									<div class="col text-left">puissance : ${a.puissance} [${a.type}]</div>
-								</div>
+
 						</div>
 					</div>
 				</div>

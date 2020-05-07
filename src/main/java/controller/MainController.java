@@ -23,5 +23,4 @@ public class MainController {
 		return "/WEB-INF/gamescene";
 	}
 	
-
 }

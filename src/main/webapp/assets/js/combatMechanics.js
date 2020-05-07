@@ -8,33 +8,60 @@ $(document).ready(function(){
 		console.log("healing")
 		$.ajax({
 			type:"POST",
-			url:'/fakemon-front/mechanics',
-			data:{"activity":"heal"}
+			url:'player/heal'
 		})
 	}
 	
 	function setupMonsters(){
 		
 		$.ajax({
-			type:'POST',
-			url: '/fakemon-front/mechanics',
+			type:'GET',
+			url: 'combat/setup',
 			data:{'activity':'monstersInfos'},
 			success: function(resp){
 				data = JSON.parse(resp)
-				
+				console.log("SETUP")
+				console.log(data)
 				adversaire = data.adversaire
 				attaquant = data.attaquant
 				
 				pvBarPlayMon = $("#progressPlayMon")
-				pvPlayMonPrg = data.attaquant.PV/data.attaquant.PVmax*100
+				pvPlayMonPrg = data.attaquant.pv/data.attaquant.pvMax*100
 				
 				pvBarPlayMon.css("width",pvPlayMonPrg+"%")
 				
 				pvBarAdvMon = $("#progressAdv")
 				pvBarAdvMon.css("position","relative")
-				pvAdvMonPrg = data.adversaire.PV/data.adversaire.PVmax*100
+				pvAdvMonPrg = data.adversaire.pv/data.adversaire.pvMax*100
 				pvBarAdvMon.css("width",pvAdvMonPrg+"%")
 				$("#xp").text(data.attaquant.exp+"/"+data.attaquant.expNextLevel)
+				
+				$("#nomAttaquant").text(attaquant.nom)
+				$("#lvlAttaquant").text("lvl : "+attaquant.level)
+				
+				
+				atks = attaquant.listAttaque
+				console.log(atks)
+				$("#menuSelectAtk").empty()
+				$.each(atks,function(i,atk){
+					console.log(atk)
+					row = $('<div class="row"></div>')
+					btnContainer = $('<div class="col-4"></div>')
+					btnAtk = $('<button class="btn btn-link text-dark"></button>')
+					btnAtk.attr('data-toggle','collapse')
+					btnAtk.attr('data-target',atk.nom+'Col')
+					btnAtk.click({id:atk.id},sendCombat)
+					btnAtk.text(atk.nom)
+					
+					indic = $('<div class="col text-left"></div>')
+					indic.text("puissance : "+atk.puissance+" ["+atk.type+"]")
+					
+					btnContainer.append(btnAtk)
+					row.append(btnContainer)
+					row.append(indic)
+					$('#menuSelectAtk').append(row)
+				})
+				
 			}
 		})
 	}
@@ -60,17 +87,14 @@ $(document).ready(function(){
 			$.ajax({
 			
 			type:"POST",
-			url:'/fakemon-front/actioncombat',
-			data:{'playerPlays':false,'handTo':'adv','action':'attaque'},
+			url:'combat/attaquebot',
+			data:{'attaquant' : JSON.stringify(attaquant),'adversaire' : JSON.stringify(adversaire)},
 			success: function(response){
 				rep = JSON.parse(response)
 				console.log("bot")
-				console.log(rep)
-				pvBarPlayMon = $("#progressPlayMon")
-				pvPlayMonPrg = rep.pvAtk/rep.pvMaxAtk*100
-				pvBarPlayMon.css("width",pvPlayMonPrg+"%")
-				pvBarPlayMon.text(rep.pvAtk+" / "+rep.pvMaxAtk)
+				
 				hasMsg(rep.msg)
+				setupMonsters()
 				isFightEnded(rep.endFight)
 				hasPlayed(rep.playerTurn, rep.endFight)
 			}
@@ -102,28 +126,47 @@ $(document).ready(function(){
 		}
 	}
 	
-	function moveToIndex(){
-		window.location.href="/fakemon-front/gamescene"
-	}
-	
-	function switchMonster(){
+	function switchMonster(e){
+		
 		$.ajax({
 			
 			type:"POST",
-			url:'/fakemon-front/actioncombat',
-			data:{'action':'switch','context':'combat'},
+			url:'combat/switch',
+			data:{'entity':'player','id':e.data.id},
 			success: function(response){
-				$("#sceneCombat").html(response)
+				setupMonsters()
+
 			}
 			
+		})
+	}
+	
+	function listSwitch(){
+		$.ajax({
+			type:'GET',
+			url:'player/squad',
+			success: function(resp){
+				data = JSON.parse(resp)
+				listBody = $('<div style="position:absolute; z-index:0; top:50%,left:50%"></div>')
+				$.each(data,function(k,v){
+					listItem = $('<div class="row"></div>')
+					listItemContent = $('<button class="btn btn-link"></button>')
+					listItemContent.click({id : v.id},switchMonster)
+					listItemContent.text(v.nom+":"+v.id)
+					listItem.append(listItemContent)
+					listBody.append(listItem)
+				})
+				$("#menuSelectAtk").empty()
+				$("#menuSelectAtk").append(listBody)
+			}
 		})
 	}
 	
 	function capture(){
 		$.ajax({
 			
-			type:"POST",
-			url:'/fakemon-front/actioncombat',
+			type:"GET",
+			url:'combat/capture',
 			data:{'action':'capture'},
 			success: function(response){
 				console.log("capture")
@@ -136,27 +179,34 @@ $(document).ready(function(){
 		})
 	}
 	
-	function sendCombat(atkId){
-		
+	function moveToIndex(){
+		/*$.ajax({
+			method:"GET",
+			url:"scene",
+			success:function(resp){
+				elem = $(resp).find("#scene")
+				$("#scene").html(elem.html())
+			}
+		})*/
+		window.location.href="scene"
+	}
+	
+	function sendCombat(e){
+		atkId = e.data.id
+		console.log(attaquant)
 		$.ajax({
 			
 			type:"POST",
-			url:'/fakemon-front/actioncombat',
-			data:{'atkId' : atkId,'playerPlays':true,'handTo':'player','action':'attaque'},
+			url:'combat/attaque',
+			data:{'atkId' : atkId,'playerPlays':true,'handTo':'player','action':'attaque', 'attaquant' : JSON.stringify(attaquant),'adversaire' : JSON.stringify(adversaire)},
 			success: function(response){
 				console.log("player")
 				rep = JSON.parse(response)
 				console.log(rep)
 				console.log("Player")
-	
-				pvBarAdvMon = $("#progressAdv")
-				pvBarMonAdvVal = rep.pvAdv/rep.pvMaxAdv*100
-				pvBarAdvMon.css("width",pvBarMonAdvVal+"%")
-				pvBarAdvMon.text(rep.pvAdv+" / "+rep.pvMaxAdv)
-				
-				$("#xp").text(rep.monster.exp+"/"+rep.monster.expNextLevel)
 				
 				hasMsg(rep.msg)
+				setupMonsters()
 				isFightEnded(rep.endFight)
 				hasPlayed(rep.playerTurn,rep.endFight)
 				
@@ -165,6 +215,7 @@ $(document).ready(function(){
 		})
 		
 	}
+	
 	function toasty(){
 		$("#toastyAudio").get(0).play()
 		$("#toastyJordan").addClass("toast-it")

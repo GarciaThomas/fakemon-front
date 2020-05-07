@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer{
 	 */
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/assets/**");
+		registry.addResourceHandler("/assets/**").addResourceLocations("/assets/");
 	} 
 	
 	//	ViewResolver pour le Spring-jsp
@@ -43,6 +43,17 @@ public class WebConfig implements WebMvcConfigurer{
 		templateResolver.setCharacterEncoding("UTF-8");
 		templateResolver.setCacheable(false);	//	ne pas faire ça en production !!!! Très problématique
 		return templateResolver;
+	}
+	@Bean public SpringTemplateEngine templateEngine(SpringResourceTemplateResolver templateResolver) { 
+		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+		templateEngine.setTemplateResolver(templateResolver); 
+		templateEngine.setEnableSpringELCompiler(true);
+		return templateEngine;
+	}
+	@Bean public ThymeleafViewResolver viewResolver(SpringTemplateEngine templateEngine) { 
+		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+		viewResolver.setTemplateEngine(templateEngine); 
+		return viewResolver;
 	}
 
 	// Comme les factories

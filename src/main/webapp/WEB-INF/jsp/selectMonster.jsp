@@ -26,7 +26,7 @@ $(document).ready(function(){
 		idx = event.data.param1
 		$.ajax({
 			type:"POST",
-			url:'/fakemon-front/setupsession',
+			url:'combat/',
 			data:{'mstrId' : idx,'playerPlays':true},
 			success: function(resp){
 				$("#scene").html(resp)
@@ -37,9 +37,8 @@ $(document).ready(function(){
 	
 	function loadList(){
 			$.ajax({
-			type:"POST",
-			url:'/fakemon-front/selection',
-			data : {"status":"passeList"},
+			type:"GET",
+			url:'player/squad',
 			success: function(resp){
 				data = JSON.parse(resp)
 				$.each(data,function(index,val){
@@ -53,7 +52,6 @@ $(document).ready(function(){
 					elemLi.css({"box-shadow":"#eaeaea 2px 4px","margin-bottom":"2px"})
 					elem.text(val.nom)
 					
-					console.log(val.PV)
 					if(val.PV <= 0){
 						console.log("disabling")
 						elem.prop("disabled","true")

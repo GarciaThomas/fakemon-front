@@ -1,16 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="ISO-8859-1">
-<title>Selection</title>
-
-<script>
 $(document).ready(function(){
+
 	updatePlayer()
 	var tailleCase = 40
 	var scene = {}
+	updatePlayer()
 	sceneSetup()
 	/**
 	* Gestion des mouvements dans la scene
@@ -74,8 +67,8 @@ $(document).ready(function(){
 	*	@param x,y int,int position sur la grille
 	*/
 	function checkEncounter(x,y){
-		encounterX = scene.encounter.x
-		encounterY = scene.encounter.y
+		encounterX = scene.triggers.encounter[0]
+		encounterY = scene.triggers.encounter[1]
 		posY = parseInt(avatar.attr("posY"))
 		posX = parseInt(avatar.attr("posX"))
 		
@@ -89,8 +82,8 @@ $(document).ready(function(){
 		console.log("updating")
 		$.ajax({
 			type:'POST',
-			url:'${pageContext.request.contextPath}/mechanics',
-			data:{'activity':'updateInfos','lastY':parseInt($("#avatar").attr("posY")),'lastX':parseInt($("#avatar").attr("posX"))}
+			url:'player/posupdate',
+			data:{'y':parseInt($("#avatar").attr("posY")),'x':parseInt($("#avatar").attr("posX")),'scene' : scene.id}
 		})
 	}
 	
@@ -98,41 +91,25 @@ $(document).ready(function(){
 		console.log("selecting")
 		$.ajax({
 			
-			type:"POST",
-			url:'${pageContext.request.contextPath}/actioncombat',
-			data:{'action':'switch','context':'select'},
+			type:"GET",
+			url:'mechanics/select',
 			success: function(resp){
-				console.log(resp)
+				//console.log(resp)
 				$("#scene").html(resp)
 			}
 			
 		})
 	}
-	
-	function combat(event){
-		idx = event.data.param1
-		$.ajax({
-			type:"POST",
-			url:'/fakemon-front/setupsession',
-			data:{'mstrId' : idx,'playerPlays':true},
-			success: function(resp){
-				$("#scene").html(resp)
-				$("#scene").css("display","block")
-				$("#select").css("display","none")
-			}
-		});
-		
-	}
+
 	
 	/**
 	*	Regarde si la position donnee est accessible par l'avatar
 	*	@param x,y int,int position sur la grille
 	*/
 	function checkWalk(x,y){
-		jsonNoWalk = ${noWalk}
 		returnBool = true
-		if(jsonNoWalk.hasOwnProperty(y)){
-			returnBool = $.inArray(x,jsonNoWalk[y])
+		if(scene.nowalk.hasOwnProperty(y)){
+			returnBool = $.inArray(x,scene.nowalk[y])
 			if(returnBool === -1){
 				returnBool = true
 			}else{
@@ -148,8 +125,8 @@ $(document).ready(function(){
 	
 	function checkTrigger(x,y){
 		/**
-		*	ToDo : trouver le moyen d'avoir une liste des triggers possible sur le setup et déclencher les bonnes fonctions
-		*/
+		*	ToDo : trouver le moyen d'avoir une liste des triggers possible sur le setup et dÃ©clencher les bonnes fonctions
+		
 		
 		if(x == 3 && y == 3){
 			setupObj = {
@@ -160,10 +137,16 @@ $(document).ready(function(){
 			nextTile(setupObj)
 		}
 		
+		
+		trigger = scene.triggers.interact[0]
+		elem = $(trigger.html)
+		console.log(elem)
+		$("#scene").append(elem)*/
+		
 	}
 	
 	function nextTile(setupObj){
-		$("#scene").css("background-image","url(${pageContext.request.contextPath}/assets/img/"+setupObj.background+")")
+		$("#scene").css("background-image","url(assets/img/"+setupObj.background+")")
 		$("#avatar").css("top",tailleCase*setupObj.y)
 		$("#avatar").css("left",tailleCase*setupObj.x)
 		$("#avatar").attr("posY",setupObj.y)
@@ -172,14 +155,14 @@ $(document).ready(function(){
 	
 	function updatePlayer(){
 		$.ajax({
-			type:"POST",
+			type:"GET",
 			data: {"opt":"update"},
-			url:'/fakemon-front/playerinterface',
+			url:'player/infosTest',
 			success: function(resp){
 				data = JSON.parse(resp)
-				console.log(data)
-				posX = data.playerPos[0]
-				posY = data.playerPos[1]
+				//console.log(data)
+				posX = data.position[0]
+				posY = data.position[1]
 				avatarPosition(posX,posY)
 				
 			}
@@ -189,12 +172,27 @@ $(document).ready(function(){
 	
 	function sceneSetup(){
 		$.ajax({
-			type:"POST",
-			url:'/fakemon-front/scenesetup',
+			type:"GET",
+			url:'/fakemon-front/mechanics/scene/setup',
 			success:function(resp){
-				console.log(resp)
 				data = JSON.parse(resp)
+				console.log(data)
 				scene = data
+			}
+		});
+		
+		$.ajax({
+			type:"GET",
+			url:'player/infosTest',
+			success:function(resp){
+				//console.log(resp)
+				data = JSON.parse(resp)
+				console.log(scene.id+" : "+data.idScene)
+				if(scene.id != data.idScene){
+					updatePlayerInfos
+				}else{
+					updatePlayer()
+				}
 			}
 		});
 	}
@@ -204,30 +202,8 @@ $(document).ready(function(){
 	function heal(){
 		$.ajax({
 			type:"POST",
-			url:'${pageContext.request.contextPath}/mechanics',
+			url:'/mechanics',
 			data:{"activity":"heal"}
 		})
 	}
 });
-
-</script>
-</head>
-<body>
-	<div id="game" class="container">
-		<div class="row h-100 justify-content-around align-items-center no-gutters">
-			<div class="col-4 p-0">
-				<div id="scene" style="width:404px;height:404px;border-radius:2px;border:black 2px solid;background-color:white;background-image:url('${pageContext.request.contextPath}/assets/img/fondScene.png');background-size:cover">
-					<img
-						width="40"
-						height="40"
-						id="avatar" 
-						src="${pageContext.request.contextPath}/assets/img/avatar.png"
-						style="position:relative;z-index:2;"
-						posX="0"
-						posY="0"
-					/>
-				</div>
-		</div>
-	</div>
-</body>
-</html>

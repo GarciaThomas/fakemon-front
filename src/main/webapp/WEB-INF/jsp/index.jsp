@@ -5,79 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <title></title>
-<script type="text/javascript">
-$(document).ready(function(){
-	killSession();
-	// attribution des fonctions
-	$("#btnScene").click(versScene)
-	$("#btnContinuer").click(autofire)
-	$("#btnOptions").click(autofire)
-	$("#btnDemo").click(versCombat)
-	$("#btnNouvelle").click(autofire)
-	btnMenu = $("#btnMenuJoueur")
-	btnMenu.click(versMenuJoueur)
-
-	$("#menuList > li").hover(
-		function(){
-			$(this).find("button").text("["+$(this).find("button").text()+"]")
-		},
-		function(){
-			$(this).find("button").text($(this).find("button").text().replace("[",''))
-			$(this).find("button").text($(this).find("button").text().replace("]",''))
-	});
-	
-	function autofire(){
-		$(".collapse").collapse()
-		$("#rickVid").get(0).play()
-	}
-	
-	function versCombat(){
-		$.ajax({
-			type:"POST",
-			url:'${pageContext.request.contextPath}/selection',
-			data:"newSession="+true,
-			success: function(){
-				window.location.href='${pageContext.request.contextPath}'+'/selection'
-			}
-		})
-	}
-	
-	function versMenuJoueur(){
-		$.ajax({
-			type:"POST",
-			url:'${pageContext.request.contextPath}/menujoueur',
-			success: function(){
-				window.location.href='${pageContext.request.contextPath}'+'/menujoueur'
-			}
-		})
-	}
-	
-	function versScene(){
-		killSession()
-		$.ajax({
-			type:"POST",
-			url:'${pageContext.request.contextPath}/playerinterface',
-			data: {"opt" : "new"}
-		})	
-		
-		$.ajax({
-			type:"POST",
-			url:'${pageContext.request.contextPath}/gamescene',
-			success: function(){
-				window.location.href='${pageContext.request.contextPath}'+'/gamescene'
-			}
-		})		
-	}
-	
-	function killSession(){
-		$.ajax({
-			type:'POST',
-			url:'/fakemon-front/mechanics',
-			data:{'activity':'killSession'}
-		})
-	}
-});
-</script>
+<script type="text/javascript" src="assets/js/index.js"></script>
 </head>
 <body>
     <div 
@@ -206,7 +134,7 @@ $(document).ready(function(){
                         <li><button class="btn btn-link text-dark"  id="btnOptions">options</button></li>
                        <ul>
                         	<li><button class="btn btn-link text-dark" id="btnMenuJoueur">menu</button></li>
-                        	<li><button class="btn btn-link text-dark" id="btnScene">scene</button></li>
+                        	<li><button class="btn btn-link text-dark" id="btnScene"> <a href="scene">scene</a></button></li>
                         </ul>
                     </ul>
                 </div>
