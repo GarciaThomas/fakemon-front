@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dao.IDAOMonster;
 import model.Action;
+import model.Dresseur;
 import model.Monster;
 import model.PVException;
 import service.ContextService;
@@ -40,9 +41,15 @@ public class Combat {
 	public String launchCombat(@RequestParam Map<String,String> data, HttpServletRequest request) {
 
 		System.out.println("Test "+data.get("mstrId"));
-		request.getSession().setAttribute("attaquant", player.getEquipePlayer().get(Integer.parseInt(data.get("mstrId"))));
-		request.getSession().setAttribute("adversaire", player.rencontreSauvage());
-		
+		Monster playerMonster =  player.getEquipePlayer().stream().filter(m -> m.getUniqueId().toString().equals(data.get("mstrId"))).findAny().get();
+		request.getSession().setAttribute("attaquant", playerMonster);
+		try {
+			if(request.getSession().getAttribute("localisation").equals("wilds")) {
+				request.getSession().setAttribute("adversaire", player.rencontreSauvage());
+			}
+		}catch(Exception e) {
+			System.out.println("pas d'attribut \"location\"");
+		}
 		
 		return "combat";
 	}
@@ -114,7 +121,8 @@ public class Combat {
 		Monster m2;
 		
 		try {
-			m1 = om.readValue(data.get("attaquant"), Monster.class);
+			Monster monster = om.readValue(data.get("attaquant"), Monster.class);
+			m1 = player.getEquipePlayer().stream().filter(m -> m.getUniqueId().toString().equals(monster.getUniqueId().toString())).findAny().get();
 			m2 = om.readValue(data.get("adversaire"), Monster.class);
 
 			try {
@@ -126,11 +134,43 @@ public class Combat {
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				if(m1.getPV() > 0)
-					m1.getExpGain();
-				player.soinEquipeJoueur();
-				sb.append("\"playerTurn\":false");
-				sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
+				
+				String localisation = (String) request.getSession().getAttribute("localisation");
+				if(localisation.contentEquals("arena")) {
+					//player turn false,switch en face
+					Dresseur d =  ctx.getArene().stream().filter(dres -> dres.getUniqueId().toString().equals(request.getSession().getAttribute("dresseur"))).findFirst().get();
+					String uidMonstre = m2.getUniqueId().toString();
+					System.out.println(uidMonstre);
+					System.out.println(d);
+					if(d.getEquipeDresseur().size()>0) {
+						d.getEquipeDresseur().forEach(System.out::println);
+						Monster mTemp = d.getEquipeDresseur().stream().filter(mDresseur -> mDresseur.getUniqueId().toString().equals(uidMonstre)).findFirst().get();
+						d.getEquipeDresseur().remove(mTemp);
+						if(d.checkEquipeDresseur()) {
+							m2 = d.getEquipeDresseur().peek();
+							sb.append("\"playerTurn\":"+true);
+							sb.append(",\"endFight\":"+false+",\"msg\": \""+d.getNom()+" change de monstre pour "+m2.getNom()+"\"");
+						}else {
+							m1.getExpGain();
+							player.soinEquipeJoueur();
+							sb.append("\"playerTurn\":false");
+							sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\\n Tu as battu "+d.getNom()+"\"");
+						}
+					}else {
+						m1.getExpGain();
+						player.soinEquipeJoueur();
+						sb.append("\"playerTurn\":false");
+						sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\\n Tu as battu "+d.getNom()+"\"");						
+					}
+				}else {
+					if(m1.getPv() > 0)
+						m1.getExpGain();
+					player.soinEquipeJoueur();
+					sb.append("\"playerTurn\":false");
+					sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
+				}
+					
+
 			}
 			
 			request.getSession().setAttribute("attaquant", m1);
@@ -162,24 +202,28 @@ public class Combat {
 		Monster m2;
 		ObjectMapper om = new ObjectMapper();
 		try {
-			m2 = om.readValue(data.get("attaquant"), Monster.class);
+			Monster monster = om.readValue(data.get("attaquant"), Monster.class);
+			m2 = player.getEquipePlayer().stream().filter(m -> m.getUniqueId().toString().equals(monster.getUniqueId().toString())).findAny().get();
 			m1 = om.readValue(data.get("adversaire"), Monster.class);	
 			
 			try {
 				int atkId = m1.choixAttaqueBOT(m2,ctx).getId();
 				Action act = m1.combat(m2,atkId,ctx);
 				m2 = act.getM();
-				act.append(m2.getPV()+" restant");
+				act.append(m2.getPv()+" restant");
 				sb.append("\"playerTurn\":true");
 				sb.append(",\"endFight\":"+false+",\"msg\": \""+act.getMessage()+"\"");
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				if(m1.getPV() > 0)
-					m1.getExpGain();
-				player.soinEquipeJoueur();
-				sb.append("\"playerTurn\":true");
-				sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
+				if(player.checkEquipeJoueur()) {
+					sb.append("\"playerTurn\":true");
+					sb.append(",\"endFight\":"+false+",\"msg\": \""+m2.getNom()+" est K.O !\"");
+				}else {
+					player.soinEquipeJoueur();
+					sb.append("\"playerTurn\":false");
+					sb.append(",\"endFight\":"+true+",\"msg\": \"Fin du combat !!\"");
+				}
 			}
 			request.getSession().setAttribute("attaquant", m2);
 			request.getSession().setAttribute("adversaire", m1);
@@ -188,6 +232,7 @@ public class Combat {
 			e1.printStackTrace();
 		}
 		sb.append(",\"status\" : \"attaque\"}");
+		System.out.println(sb.toString());
 		return sb.toString();
 
 	}

@@ -56,6 +56,13 @@ body{
 	border:1px solid black;
 }
 
+.dialog-box{
+	margin:0 auto;
+	border:black 8px solid;
+	border-radius:5px;
+	background-color:#eaeaea
+}
+
 /**
 ANIMATIONS
 **/

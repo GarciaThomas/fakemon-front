@@ -1,18 +1,6 @@
 $(document).ready(function(){
-	
-	loadList()
-
-	$("#listSelect").children().hover(
-		function(){
-			$(this).css("box-shadow","black 2px 2px")
-		},
-		function(){
-			$(this).css("box-shadow","#eaeaea 2px 2px")
-		}
-	);		
-
-
-
+	loadList()		
+});
 	function versCombat(event){
 		idx = event.data.param1
 		$.ajax({
@@ -27,12 +15,14 @@ $(document).ready(function(){
 	}
 	
 	function loadList(){
+			console.log("charge la liste")
 			$.ajax({
 			type:"GET",
 			url:'player/squad',
 			success: function(resp){
 				data = JSON.parse(resp)
 				$.each(data,function(index,val){
+					console.log(val)
 					let elemLi = $("<li></li>")
 					let elem = $("<button></button>")
 					
@@ -47,13 +37,19 @@ $(document).ready(function(){
 						console.log("disabling")
 						elem.prop("disabled","true")
 					}else{
-						elem.click({param1:index},versCombat)
+						elem.click({param1:val.uniqueId},versCombat)
 					}
 					elemLi.append(elem)
-					$("#listSelect").append(elemLi)
+					elemLi.hover(
+						function(){
+							$(this).css("box-shadow","black 2px 2px")
+						},
+						function(){
+							$(this).css("box-shadow","#eaeaea 2px 2px")
+					})
 					
-				})				
+					$("#listSelect").append(elemLi)
+				})
 			}
 		})
 	}
-});

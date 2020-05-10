@@ -1,8 +1,11 @@
 package controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,11 +21,21 @@ public class PlayerMechanics {
 	@Autowired
 	PlayerService player;
 	
+	@PostMapping("/starter/{id}")
+	@ResponseBody
+	public String selectStarter(@PathVariable int id) {
+		
+		player.addEquipePlayer(player.getStarters().get(0));
+		return "";
+	}
+	
 	@PostMapping("/posupdate")
 	@ResponseBody
-	public boolean playerInfos(@RequestParam int x, @RequestParam int y, @RequestParam int scene) {
-//		player.setIdScene(scene);
+	public boolean playerInfos(@RequestParam int x, @RequestParam int y, @RequestParam int scene,@RequestParam String localisation, HttpServletRequest request) {
+		//System.out.println("Updating player informations : "+localisation);
+		player.setIdScene(scene);
 		player.setPosition(new int[]{x,y});
+		request.getSession().setAttribute("localisation", localisation);
 		return true;
 	}
 	
@@ -39,7 +52,7 @@ public class PlayerMechanics {
 		String playerInfos ="";
 		try {
 			 playerInfos = om.writeValueAsString(player);
-			System.out.println(playerInfos);
+			//System.out.println(playerInfos);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,6 +61,7 @@ public class PlayerMechanics {
 	}
 	
 	@GetMapping("/heal")
+	@ResponseBody
 	public void healSquad() {
 		player.soinEquipeJoueur();
 	}
@@ -55,7 +69,10 @@ public class PlayerMechanics {
 	@GetMapping("/squad")
 	@ResponseBody
 	public String getSquad() {
+		System.out.println("Accessing squad");
 		int size = player.getEquipePlayer().size();
+		System.out.println("equipe");
+		System.out.println(player.getEquipePlayer());
 		if(size == 0) {
 			player.addEquipePlayer(player.rencontreSauvage());
 		}
@@ -74,6 +91,7 @@ public class PlayerMechanics {
 		return jsonToReturn;
 		
 	}
+	
 	
 	
 }

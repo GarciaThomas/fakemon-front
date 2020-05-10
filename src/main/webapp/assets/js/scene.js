@@ -1,11 +1,10 @@
 $(document).ready(function(){
 
-	updatePlayer()
-	var tailleCase = 40
-	var scene = {}
-	updatePlayer()
+
+	
 	sceneSetup()
-	/**
+	updatePlayer()
+		/**
 	* Gestion des mouvements dans la scene
 	* @param e event lorsque la touche est relachee
 	*/
@@ -20,30 +19,32 @@ $(document).ready(function(){
 				//haut
 				actualY = (posY-1)*tailleCase
 				if(checkWalk(posX,posY-1)){
-					avatar.css("top",actualY+"px")
-					avatar.attr("posY",posY-1)
+					/*avatar.css("top",actualY+"px")
+					avatar.attr("posY",posY-1)*/
+					avatarPosition(posX,posY-1)
 				}
 			}else if(e.keyCode==40){
 				//bas
-				actualY = (posY+1)*tailleCase
+				//actualY = (posY+1)*tailleCase
 				if(checkWalk(posX,posY+1)){
-					avatar.css("top",actualY+"px")
-					avatar.attr("posY",posY+1)
+					avatarPosition(posX,posY+1)
 				}
 			}else if(e.keyCode == 39){
 				//droite
 				
 				newX = (posX+1) * tailleCase
 				if(checkWalk(posX+1,posY)){
-					avatar.css("left",newX+"px")
-					avatar.attr("posX",posX+1)
+					/*avatar.css("left",newX+"px")
+					avatar.attr("posX",posX+1)*/
+					avatarPosition(posX+1,posY)
 				}
 			}else if(e.keyCode == 37){
 				//gauche
 				newX=(posX-1) * tailleCase
 				if(checkWalk(posX-1,posY)){
-					avatar.css("left",newX+"px")
-					avatar.attr("posX",posX-1)
+					/*avatar.css("left",newX+"px")
+					avatar.attr("posX",posX-1)*/
+					avatarPosition(posX-1,posY)
 				}
 			}
 			posY = parseInt(avatar.attr("posY"))
@@ -52,14 +53,22 @@ $(document).ready(function(){
 			checkTrigger(posX,posY)
 		}
 	})
+});
+
+var tailleCase = 40
+var scene = {}
+var avatarMove = true;
+
 	
 	function avatarPosition(x,y){
-		
-		avatar = $("#avatar")
-		avatar.css("left",(x*tailleCase)+"px")
-		avatar.css("top",(y*tailleCase)+"px")
-		avatar.attr("posX",x)
-		avatar.attr("posY",y)
+		console.log(avatarMove)
+		if(avatarMove){
+			avatar = $("#avatar")
+			avatar.css("left",(x*tailleCase)+"px")
+			avatar.css("top",(y*tailleCase)+"px")
+			avatar.attr("posX",x)
+			avatar.attr("posY",y)
+		}
 	}
 	
 	/**
@@ -83,7 +92,7 @@ $(document).ready(function(){
 		$.ajax({
 			type:'POST',
 			url:'player/posupdate',
-			data:{'y':parseInt($("#avatar").attr("posY")),'x':parseInt($("#avatar").attr("posX")),'scene' : scene.id}
+			data:{'y':parseInt($("#avatar").attr("posY")),'x':parseInt($("#avatar").attr("posX")),'scene' : scene.id,'localisation':scene.type}
 		})
 	}
 	
@@ -94,7 +103,6 @@ $(document).ready(function(){
 			type:"GET",
 			url:'mechanics/select',
 			success: function(resp){
-				//console.log(resp)
 				$("#scene").html(resp)
 			}
 			
@@ -125,23 +133,38 @@ $(document).ready(function(){
 	
 	function checkTrigger(x,y){
 		console.log("trigger")
-		inter = scene.triggers.interact[0]
-		if(inter.pos[0] == x && inter.pos[1] == y){
-			if(inter.event_type == "move"){
-				console.log("ok")
-				updatePlayerInfos()
-				sceneSetup()
-			}
+		interactions = scene.triggers.interact
+		sceneChange = scene.triggers.scenes
+		updatePlayerInfos()
+		if(interactions.length > 0){
+			$.each(interactions,function(idx){
+				inter = interactions[idx]
+				if(inter.pos[0] == x && inter.pos[1] == y){
+					if(inter.event_type == "script"){
+						var script = inter.script
+						console.log("eval script")
+						$.getScript(script)
+					}else if(inter.event_type == "dresseur"){
+						console.log("dresseur")
+						selectMonsterMenu()
+					}
+				}
+			})
+
+		}
+
+		if(sceneChange.length > 0){
+			$.each(sceneChange,function(idx){
+				sceneToCheck = sceneChange[idx]
+				if(sceneToCheck.pos[0] == x && sceneToCheck.pos[1] == y){
+					sceneSetupId(sceneToCheck.id)
+					updatePlayerInfos()
+				}
+			})
 		}
 		
-	}
-	
-	function nextTile(setupObj){
-		$("#scene").css("background-image","url(assets/img/"+setupObj.background+")")
-		$("#avatar").css("top",tailleCase*setupObj.y)
-		$("#avatar").css("left",tailleCase*setupObj.x)
-		$("#avatar").attr("posY",setupObj.y)
-		$("#avatar").attr("posX",setupObj.x)
+		
+		
 	}
 	
 	function updatePlayer(){
@@ -160,17 +183,61 @@ $(document).ready(function(){
 		})
 	}
 	
+	function sceneSetupId(id){
+		$.ajax({
+			type:"GET",
+			url:'/fakemon-front/mechanics/scene/'+id,
+			success:function(resp){
+				console.log(resp)
+				data = JSON.parse(resp)
+				console.log(data)
+				scene = data
+				$("#scene").css("background-image","url("+scene.background+")")
+				$("#scene").css("background-color","none")
+				setTriggersTiles()
+				if(scene.hasOwnProperty("script")){
+					$.getScript(scene.script)
+				}
+			}
+		});
+		
+		$.ajax({
+			type:"GET",
+			url:'player/infosTest',
+			success:function(resp){
+				data = JSON.parse(resp)
+				console.log(scene.id+" : "+data.idScene)
+				if(scene.id != data.idScene){
+					console.log("onUpdate boiii")
+					
+					posX = scene.startpos[0]
+					posY = scene.startpos[1]
+					avatarPosition(posX,posY)
+					updatePlayerInfos()
+				}else{
+					console.log("moving boiii")
+					updatePlayerInfos()
+				}
+			}
+		});
+	}
 	
 	function sceneSetup(){
 		$.ajax({
 			type:"GET",
 			url:'/fakemon-front/mechanics/scene/setup',
 			success:function(resp){
+				console.log(resp)
 				data = JSON.parse(resp)
 				console.log(data)
 				scene = data
 				$("#scene").css("background-image","url("+scene.background+")")
 				$("#scene").css("background-color","none")
+				setTriggersTiles()
+				if(scene.hasOwnProperty("script")){
+					console.log("cette scene execute un script")
+					$.getScript(scene.script)
+				}
 			}
 		});
 		
@@ -194,6 +261,61 @@ $(document).ready(function(){
 		});
 	}
 	
+	function setTriggersTiles(){
+		$("img[type='dresseur']").remove()
+		$("img[type='prop']").remove()
+		$("div[type='portail']").remove()
+		if(scene.triggers.scenes.length > 0){
+			scenesArray = scene.triggers.scenes
+			
+			$.each(scenesArray,function(idx){
+				item = scenesArray[idx]
+				porte = $("<div type='portail' style=' display:block; position:absolute; z-index:1; height:40px; width:40px;'></div>")
+				porte.css("top",(tailleCase*item.pos[1])+"px")
+				porte.css("left",(tailleCase*item.pos[0])+"px")
+				if(scene.style != undefined){
+					porte.css('background-image',"url("+scene.style.portail+")")
+					porte.css('background-size','cover')
+					if(item.orientation == "east"){
+						porte.css("transform",'rotate(-90deg)')
+					}else if(item.orientation == "west"){
+						porte.css("transform",'rotate(90deg)')
+					}else if(item.orientation == 'north'){
+						porte.css("transform",'rotate(180deg)')
+					}
+				}
+
+				$("#scene").append(porte)
+			})
+		}
+		
+		if(scene.triggers.interact.length > 0){
+			console.log("pop dresseur")
+			interactions = scene.triggers.interact
+
+			$.each(interactions,function(idx){
+				console.log(interactions[idx])
+				if(interactions[idx].event_type == "dresseur"){
+					console.log("OMG un dresseur!!")
+					item = interactions[idx]
+					dresseur = $("<img src='assets/img/monsters/1.png' type='dresseur' style='position:absolute; z-index:1; height:40px; width:40px;' />")
+					dresseur.css("top",(tailleCase*item.pos[1])+"px")
+					dresseur.css("left",(tailleCase*item.pos[0])+"px")
+					$("#scene").append(dresseur)
+				}
+				if(interactions[idx].hasOwnProperty("prop")){
+					item = interactions[idx].prop
+					console.log(item)
+					
+					prop = $("<img type='prop' src='"+item.asset+"' style='position:absolute; z-index:1;'/>")
+					prop.css("top",(tailleCase*item.pos[1])+"px")
+					prop.css("left",(tailleCase*item.pos[0])+"px")
+					$("#scene").append(prop)
+				}
+			})
+		}
+	}
+	
 	btnHeal = $("#healBtn")
 	
 	function heal(){
@@ -203,4 +325,3 @@ $(document).ready(function(){
 			data:{"activity":"heal"}
 		})
 	}
-});

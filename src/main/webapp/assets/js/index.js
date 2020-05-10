@@ -46,8 +46,7 @@ $(document).ready(function(){
 	function killSession(){
 		$.ajax({
 			type:'POST',
-			url:'/fakemon-front/mechanics',
-			data:{'activity':'killSession'}
+			url:'mechanics/session'
 		})
 	}
 });

@@ -7,7 +7,7 @@ $(document).ready(function(){
 	function heal(){
 		console.log("healing")
 		$.ajax({
-			type:"POST",
+			type:"GET",
 			url:'player/heal'
 		})
 	}
@@ -38,7 +38,8 @@ $(document).ready(function(){
 				
 				$("#nomAttaquant").text(attaquant.nom)
 				$("#lvlAttaquant").text("lvl : "+attaquant.level)
-				
+				$("#nomAdv").text(adversaire.nom)
+				$("#lvlAdv").text("lvl : "+adversaire.level)
 				
 				atks = attaquant.listAttaque
 				console.log(atks)

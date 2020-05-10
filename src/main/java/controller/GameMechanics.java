@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,43 +9,99 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpServerErrorException;
 
-import model.Player;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import model.Dresseur;
+import service.ContextService;
+import service.PlayerService;
 
 @Controller
 @RequestMapping("/mechanics")
 public class GameMechanics {
 	
 	@Autowired
-	Player player;
+	PlayerService player;
+	@Autowired
+	ContextService ctx;
+	
+	
+	@PostMapping("/session")
+	@ResponseBody
+	public void resetSession(HttpServletRequest request) {
+		request.getSession().invalidate();
+	}
 	
 	@GetMapping("/scene/setup")
 	@ResponseBody
 	public String getSceneSetup(HttpServletRequest request) {
+
 		String rencontre = "";
-		String exemple ="";
 		if(player.peutRencontrer()) {
 			Random r = new Random();
-			rencontre = "\"encounter\": ["+r.nextInt(9)+","+(r.nextInt(4)+5)+"],";
+			rencontre =  "["+r.nextInt(9)+","+(r.nextInt(4)+5)+"]";
 		}
+		ArrayList<String> scenes = new ArrayList<String>();
+		String interaction0 = "[{\"pos\" : [3,1],\"event_type\" : \"script\", \"script\" : \"assets/js/starter.js\",\"prop\" : {\"pos\":[3,0],\"asset\":\"assets/img/Poke-Ball-32.png\"}}]";
+		String goAilleurs = "[{\"pos\" : [9,5],\"orientation\" : \"east\",\"id\" : 2},{\"pos\" : [5,9],\"orientation\" : \"south\",\"id\" : 3}]";
+		String style0 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
+		String scene0 = "{\"type\" : \"indoor\",\"style\" :"+style0+",\"id\" : 1, \"nowalk\" : {\"0\":[0,1,2,3,4,5,6,7,8]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction0+",\"scenes\" : "+goAilleurs+"}, \"startpos\" : [5,5], \"background\" : \"assets/img/fond2.png\"}";
 		
-		int scene = player.getIdScene();
-		System.out.println("Setup de scene");
-		System.out.println("player scene is : "+scene);
-		if(scene == 1) {
-			rencontre = "\"encounter\": [],";
-			String interaction = "[{\"pos\" : [1,3], \"html\" : \"<script>function test() {alert('tu veux choisir monstre 1 ?')}</script>\" }]";
-			exemple = "{\"id\" : 2, \"nowalk\" : {\"0\":[0,1,2,3,4,5,6,7,8]}, \"triggers\" : {"+rencontre+" \"interact\" : "+interaction+"}, \"startpos\" : [5,9], \"background\" : \"assets/img/fond2.png\"}";
-		}else {
-			String interaction = "[{\"pos\" : [2,2], \"event_type\" : \"move\", \"html\" : \"<button onclick='test()'><script>function test() {console.log('bravo')}</script>test</button>\" }]";
-			exemple = "{\"id\" : 1, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {"+rencontre+" \"interact\" : "+interaction+"}, \"startpos\" : [1,1], \"background\" : \"\"}";
-		}
+		String interaction1 = "[]";
+		String goAilleurs1 = "[{\"pos\" : [0,5],\"orientation\" : \"west\",\"id\" : 1}]";
+		String style1 = "{\"portail\" : \"assets/img/peronOutdoor.png\"}";
+		String scene1 = "{\"type\" : \"wilds\",\"style\" :"+style1+",\"id\" : 2, \"nowalk\" : {}, \"triggers\" : {\"encounter\":"+rencontre+",\"interact\" : "+interaction1+",\"scenes\" : "+goAilleurs1+"}, \"startpos\" : [0,5], \"background\" : \"assets/img/outdoor.png\"}";
 		
+		
+		String interaction2 = "[]";
+		String goAilleurs2 = "[{\"pos\" : [5,0],\"orientation\" : \"north\",\"id\" : 1}]";
+		String style2 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
+		String scene2 = "{\"type\" : \"arena\",\"script\" : \"assets/js/arene.js\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [9,5], \"background\" : \"assets/img/fondScene.png\"}";
 
-		return exemple;
+		scenes.add(scene0);
+		scenes.add(scene1);
+		scenes.add(scene2);
+		if(player.getIdScene() == 0) {
+			return scenes.get(player.getIdScene());
+		}else {
+			return scenes.get(player.getIdScene()-1);
+		}
+		
+	}
+	
+	@GetMapping("scene/{id}")
+	@ResponseBody
+	public String getSceneById(@PathVariable int id) {
+		String rencontre = "";
+		if(player.peutRencontrer()) {
+			Random r = new Random();
+			rencontre =  "["+r.nextInt(9)+","+(r.nextInt(4)+5)+"]";
+		}
+		ArrayList<String> scenes = new ArrayList<String>();
+		String interaction0 = "[{\"pos\" : [3,1],\"event_type\" : \"script\", \"script\" : \"assets/js/starter.js\",\"prop\" : {\"pos\":[3,0],\"asset\":\"assets/img/Poke-Ball-32.png\"}}]";
+		String goAilleurs = "[{\"pos\" : [9,5],\"orientation\" : \"east\",\"id\" : 2},{\"pos\" : [5,9],\"orientation\" : \"south\",\"id\" : 3}]";
+		String style0 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
+		String scene0 = "{\"type\" : \"indoor\",\"style\" :"+style0+",\"id\" : 1, \"nowalk\" : {\"0\":[0,1,2,3,4,5,6,7,8]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction0+",\"scenes\" : "+goAilleurs+"}, \"startpos\" : [5,5], \"background\" : \"assets/img/fond2.png\"}";
+		
+		String interaction1 = "[]";
+		String goAilleurs1 = "[{\"pos\" : [0,5],\"orientation\" : \"west\",\"id\" : 1}]";
+		String style1 = "{\"portail\" : \"assets/img/peronOutdoor.png\"}";
+		String scene1 = "{\"type\" : \"wilds\",\"style\" :"+style1+",\"id\" : 2, \"nowalk\" : {}, \"triggers\" : {\"encounter\":"+rencontre+",\"interact\" : "+interaction1+",\"scenes\" : "+goAilleurs1+"}, \"startpos\" : [0,5], \"background\" : \"assets/img/outdoor.png\"}";
+		
+		
+		String interaction2 = "[]";
+		String goAilleurs2 = "[{\"pos\" : [5,0],\"orientation\" : \"north\",\"id\" : 1}]";
+		String style2 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
+		String scene2 = "{\"script\" : \"assets/js/arene.js\",\"type\":\"arena\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [9,5], \"background\" : \"assets/img/fondScene.png\"}";
+
+		scenes.add(scene0);
+		scenes.add(scene1);
+		scenes.add(scene2);
+		return scenes.get(id-1);
 	}
 	
 	@GetMapping("/select")
@@ -51,5 +109,54 @@ public class GameMechanics {
 		System.out.println("Go select");
 		return "selectMonster";
 	}
+	
+	public void generateArena(HttpServletRequest request) {
+		LinkedList<Dresseur> arene = new LinkedList<Dresseur>();
+		System.out.println("genere une arene");
+		for(int i =0; i<3;i++) {
+			arene.add(new Dresseur(i, player));
+		}
+		
+		request.getSession().setAttribute("arene", arene);
+	}
+	
+	@GetMapping("/arene/pop")
+	@ResponseBody
+	public String getDresseur(HttpServletRequest request) {
+		System.out.println("taille arene : "+ctx.getArene().size());
+		ObjectMapper om = new ObjectMapper();
+		String dresseur="";
+		System.out.println("dresseur");
+		System.out.println(request.getSession().getAttribute("dresseur"));
+		System.out.println(request.getSession().getAttribute("dresseur") == null);
+		if(!ctx.getArene().isEmpty()) {
+			if(request.getSession().getAttribute("dresseur") == null) {
+				Dresseur d = ctx.getArene().peek();
+				request.getSession().setAttribute("dresseur", d.getUniqueId().toString());
+				request.getSession().setAttribute("adversaire", d.getEquipeDresseur().peek());
+				dresseur = "{\"pos\" : [5,9],\"event_type\" : \"dresseur\"}";
+			}else {
+				
+				ctx.getArene().forEach(d -> System.out.println(d.getNom()+" : "+d.getUniqueId()));
+				Dresseur dres = ctx.getArene().stream().filter(d -> d.getUniqueId().toString().equals((String)request.getSession().getAttribute("dresseur"))).findFirst().get();
+				System.out.println("nom : "+dres.getNom());
+				if(!dres.checkEquipeDresseur() && dres.getEquipeDresseur().size() == 0) {
+					ctx.getArene().remove(dres);
+					if(ctx.getArene().size() > 0) {
+						request.getSession().setAttribute("dresseur", ctx.getArene().peek().getUniqueId().toString());
+						request.getSession().setAttribute("adversaire", ctx.getArene().peek().getEquipeDresseur().peek());
+						dresseur = "{\"pos\" : [5,9],\"event_type\" : \"dresseur\"}";
+					}
+				}
+			}
+		}
+		return dresseur;
+	}
+	
+	/*@GetMapping("/arene/left")
+	@ResponseBody
+	public boolean trainerSleft(HttpServletRequest request) {
+		return !ctx.getArene().isEmpty();
+	}*/
 	
 }
