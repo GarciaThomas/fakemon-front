@@ -73,7 +73,6 @@ $(document).ready(function(){
 				$(this).prop("disabled",true)
 			})
 			if(!finCombat){
-				
 				$("#imgAdv").addClass("shaking-adv")
 				setTimeout(sendCombatBot,3000);
 			}
@@ -121,6 +120,9 @@ $(document).ready(function(){
 	
 	function isFightEnded(endFight){
 		if(endFight){
+			$("#menuSelectAtk").find("button").each(function(){
+				$(this).prop("disabled",true)
+			})
 			heal()
 			toasty()
 			setTimeout(moveToIndex,4000)
@@ -152,7 +154,7 @@ $(document).ready(function(){
 				$.each(data,function(k,v){
 					listItem = $('<div class="row"></div>')
 					listItemContent = $('<button class="btn btn-link"></button>')
-					listItemContent.click({id : v.id},switchMonster)
+					listItemContent.click({id : v.uniqueId},switchMonster)
 					listItemContent.text(v.nom+":"+v.id)
 					listItem.append(listItemContent)
 					listBody.append(listItem)

@@ -56,10 +56,10 @@ public class Combat {
 	
 	@PostMapping("switch")
 	@ResponseBody
-	public boolean switchMonster(@RequestParam String entity, @RequestParam int id, HttpServletRequest request) {
+	public boolean switchMonster(@RequestParam String entity, @RequestParam String id, HttpServletRequest request) {
 		
 		if(entity.contentEquals("player")) {
-			Monster m = player.getEquipePlayer()./*parallelStream().filter(mon -> mon.getId() == id).find*/getFirst()/*.get()*/;
+			Monster m = player.getEquipePlayer().parallelStream().filter(mon -> mon.getUniqueId().toString().equals(id)).findFirst().get();
 			System.out.println("LE MONSTRE : "+m);
 			request.getSession().setAttribute("attaquant", m);
 		}

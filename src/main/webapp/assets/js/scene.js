@@ -1,8 +1,8 @@
 $(document).ready(function(){
 
-
+	setInterval(updatePlayerView,5000)
 	
-	sceneSetup()
+	getScene()
 	updatePlayer()
 		/**
 	* Gestion des mouvements dans la scene
@@ -58,7 +58,7 @@ $(document).ready(function(){
 var tailleCase = 40
 var scene = {}
 var avatarMove = true;
-
+var starterSelected = false; // je sais pas si c'est vraiment le top de la mettre ici cette variable. Elle est très contextuelle au final.
 	
 	function avatarPosition(x,y){
 		console.log(avatarMove)
@@ -87,6 +87,10 @@ var avatarMove = true;
 		}
 	}
 	
+	/**
+	 * Met a jour les infos du joueur dans le back
+	 * @returns
+	 */
 	function updatePlayerInfos(){
 		console.log("updating")
 		$.ajax({
@@ -96,6 +100,10 @@ var avatarMove = true;
 		})
 	}
 	
+	/**
+	 * Lance l'affichage de la liste de selection du monstre avant un combat
+	 * @returns
+	 */
 	function selectMonsterMenu(){
 		console.log("selecting")
 		$.ajax({
@@ -131,6 +139,12 @@ var avatarMove = true;
 		return returnBool
 	}
 	
+	/**
+	 * Verifie que la position donnee contient un trigger, si c'est le cas lance l'action correspondante
+	 * @param x
+	 * @param y
+	 * @returns
+	 */
 	function checkTrigger(x,y){
 		console.log("trigger")
 		interactions = scene.triggers.interact
@@ -167,18 +181,44 @@ var avatarMove = true;
 		
 	}
 	
+	/**
+	 * Mets a jour les donnees du joueur cote vue
+	 * @returns
+	 */
 	function updatePlayer(){
 		$.ajax({
 			type:"GET",
-			data: {"opt":"update"},
 			url:'player/infosTest',
 			success: function(resp){
 				data = JSON.parse(resp)
-				//console.log(data)
+				console.log(data)
 				posX = data.position[0]
 				posY = data.position[1]
 				avatarPosition(posX,posY)
-				
+			}
+		})
+	}
+	
+	/**
+	 * Mets a jour les infos du joueur cote vue (liste de monstre)
+	 * @returns
+	 */
+	function updatePlayerView(){
+		$("#playerInfos").empty()
+		$.ajax({
+			type:"GET",
+			url:'player/infosTest',
+			success: function(resp){
+				data = JSON.parse(resp)
+				console.log(data)
+				list = $("<div class='list-group'></div>")
+				$.each(data.equipePlayer,function(idx){
+					monstre = data.equipePlayer[idx]
+					item = $("<span class='list-group-item'></span>")
+					item.text(monstre.nom)
+					list.append(item)
+				})
+				$("#playerInfos").append(list)
 			}
 		})
 	}
@@ -188,16 +228,10 @@ var avatarMove = true;
 			type:"GET",
 			url:'/fakemon-front/mechanics/scene/'+id,
 			success:function(resp){
-				console.log(resp)
 				data = JSON.parse(resp)
 				console.log(data)
 				scene = data
-				$("#scene").css("background-image","url("+scene.background+")")
-				$("#scene").css("background-color","none")
-				setTriggersTiles()
-				if(scene.hasOwnProperty("script")){
-					$.getScript(scene.script)
-				}
+				sceneSetup()
 			}
 		});
 		
@@ -206,59 +240,65 @@ var avatarMove = true;
 			url:'player/infosTest',
 			success:function(resp){
 				data = JSON.parse(resp)
-				console.log(scene.id+" : "+data.idScene)
+				//console.log(scene.id+" : "+data.idScene)
 				if(scene.id != data.idScene){
-					console.log("onUpdate boiii")
-					
+					//console.log("onUpdate boiii")
 					posX = scene.startpos[0]
 					posY = scene.startpos[1]
 					avatarPosition(posX,posY)
 					updatePlayerInfos()
 				}else{
-					console.log("moving boiii")
+					//console.log("moving boiii")
 					updatePlayerInfos()
 				}
 			}
 		});
 	}
 	
+	function getScene(){
+		if($.isEmptyObject(scene)){
+			console.log("scene vide")
+			$.ajax({
+				type:"GET",
+				url:'/fakemon-front/mechanics/scene/setup',
+				success:function(resp){
+					console.log(resp)
+					data = JSON.parse(resp)
+					console.log(data)
+					scene = data
+					sceneSetup()
+				}
+			});
+			
+			$.ajax({
+				type:"GET",
+				url:'player/infosTest',
+				success:function(resp){
+					data = JSON.parse(resp)
+					console.log(scene.id+" : "+data.idScene)
+					if(scene.id != data.idScene){
+						//console.log("onUpdate boiii")
+						updatePlayerInfos()
+						posX = scene.startpos[0]
+						posY = scene.startpos[1]
+						avatarPosition(posX,posY)
+					}else{
+						//console.log("moving boiii")
+						updatePlayerInfos()
+					}
+				}
+			});
+		}
+	}
+	
 	function sceneSetup(){
-		$.ajax({
-			type:"GET",
-			url:'/fakemon-front/mechanics/scene/setup',
-			success:function(resp){
-				console.log(resp)
-				data = JSON.parse(resp)
-				console.log(data)
-				scene = data
-				$("#scene").css("background-image","url("+scene.background+")")
-				$("#scene").css("background-color","none")
-				setTriggersTiles()
-				if(scene.hasOwnProperty("script")){
-					console.log("cette scene execute un script")
-					$.getScript(scene.script)
-				}
-			}
-		});
-		
-		$.ajax({
-			type:"GET",
-			url:'player/infosTest',
-			success:function(resp){
-				data = JSON.parse(resp)
-				console.log(scene.id+" : "+data.idScene)
-				if(scene.id != data.idScene){
-					console.log("onUpdate boiii")
-					updatePlayerInfos()
-					posX = scene.startpos[0]
-					posY = scene.startpos[1]
-					avatarPosition(posX,posY)
-				}else{
-					console.log("moving boiii")
-					updatePlayerInfos()
-				}
-			}
-		});
+		$("#scene").css("background-image","url("+scene.background+")")
+		$("#scene").css("background-color","none")
+		setTriggersTiles()
+		if(scene.hasOwnProperty("script")){
+			console.log("cette scene execute un script")
+			$.getScript(scene.script)
+		}
 	}
 	
 	function setTriggersTiles(){
@@ -296,7 +336,7 @@ var avatarMove = true;
 			$.each(interactions,function(idx){
 				console.log(interactions[idx])
 				if(interactions[idx].event_type == "dresseur"){
-					console.log("OMG un dresseur!!")
+					//console.log("OMG un dresseur!!")
 					item = interactions[idx]
 					dresseur = $("<img src='assets/img/monsters/1.png' type='dresseur' style='position:absolute; z-index:1; height:40px; width:40px;' />")
 					dresseur.css("top",(tailleCase*item.pos[1])+"px")
@@ -305,7 +345,7 @@ var avatarMove = true;
 				}
 				if(interactions[idx].hasOwnProperty("prop")){
 					item = interactions[idx].prop
-					console.log(item)
+					//console.log(item)
 					
 					prop = $("<img type='prop' src='"+item.asset+"' style='position:absolute; z-index:1;'/>")
 					prop.css("top",(tailleCase*item.pos[1])+"px")

@@ -2,7 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org"  th:replace="~{scene_layout.html :: layout(~{::body})}">
 <body style="height : 100vh">
 	<div id="game" class="container" style="height:100%">
+	<!--   -->
 		<div class="row h-100 justify-content-around align-items-center no-gutters">
+			<div class="col-4" id="playerInfos"></div>
 			<div class="col-4 p-0">
 				<div id="scene" style="width:404px;height:404px;border-radius:2px;border:black 2px solid;background-color:white;background-image:url('assets/img/fondScene.png');background-size:cover">
 					<img
@@ -18,7 +20,7 @@
 					</div>
 				</div>
 			</div>
-
+			<div class="col-4"></div>
 		</div>
 	</body>
 </html>
