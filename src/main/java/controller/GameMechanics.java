@@ -43,7 +43,8 @@ public class GameMechanics {
 		String rencontre = "";
 		if(player.peutRencontrer()) {
 			Random r = new Random();
-			rencontre =  "["+r.nextInt(9)+","+(r.nextInt(4)+5)+"]";
+			//	Set la position de la rencontre avec le fakemon sauvage. La position ne peut être sur les bordures et est positionné sur la partie basse de la carte
+			rencontre =  "["+(r.nextInt(8)+1)+","+(r.nextInt(4)+5)+"]";
 		}
 		ArrayList<String> scenes = new ArrayList<String>();
 		String interaction0 = "[{\"pos\" : [3,1],\"event_type\" : \"script\", \"script\" : \"assets/js/starter.js\",\"prop\" : {\"pos\":[3,0],\"asset\":\"assets/img/Poke-Ball-32.png\"}}]";

@@ -9,7 +9,7 @@ $(document).ready(function(){
 	* @param e event lorsque la touche est relachee
 	*/
 	$(document).keyup(function(e){
-		if(e.keyCode == 27){
+		if(e.keyCode == 27){	//	Code "Echap"
 			console.log("Prochain emplacement menu")
 		}else{
 			avatar = $("#avatar")
@@ -23,7 +23,7 @@ $(document).ready(function(){
 					avatar.attr("posY",posY-1)*/
 					avatarPosition(posX,posY-1)
 				}
-			}else if(e.keyCode==40){
+			}else if(e.keyCode == 40){
 				//bas
 				//actualY = (posY+1)*tailleCase
 				if(checkWalk(posX,posY+1)){

@@ -1,4 +1,3 @@
-
 /*$.ajax({
 	type:"GET",
 	url:"mechanics/arene/left",
