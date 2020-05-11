@@ -210,7 +210,6 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 			url:'player/infosTest',
 			success: function(resp){
 				data = JSON.parse(resp)
-				console.log(data)
 				list = $("<div class='list-group'></div>")
 				$.each(data.equipePlayer,function(idx){
 					monstre = data.equipePlayer[idx]
