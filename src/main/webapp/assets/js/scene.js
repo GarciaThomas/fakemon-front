@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-	setInterval(updatePlayerView,5000)
+	//setInterval(updatePlayerView,5000)
 	
 	getScene()
 	updatePlayer()
@@ -9,48 +9,50 @@ $(document).ready(function(){
 	* @param e event lorsque la touche est relachee
 	*/
 	$(document).keyup(function(e){
-		if(e.keyCode == 27){	//	Code "Echap"
-			console.log("Prochain emplacement menu")
-		}else{
-			avatar = $("#avatar")
-			posY = parseInt(avatar.attr("posY"))
-			posX = parseInt(avatar.attr("posX"))
-			if(e.keyCode == 38){
-				//haut
-				actualY = (posY-1)*tailleCase
-				if(checkWalk(posX,posY-1)){
-					/*avatar.css("top",actualY+"px")
-					avatar.attr("posY",posY-1)*/
-					avatarPosition(posX,posY-1)
+		if(avatarMove){
+			if(e.keyCode == 27){
+				console.log("Prochain emplacement menu")
+			}else{
+				avatar = $("#avatar")
+				posY = parseInt(avatar.attr("posY"))
+				posX = parseInt(avatar.attr("posX"))
+				if(e.keyCode == 38){
+					//haut
+					actualY = (posY-1)*tailleCase
+					if(checkWalk(posX,posY-1)){
+						/*avatar.css("top",actualY+"px")
+						avatar.attr("posY",posY-1)*/
+						avatarPosition(posX,posY-1)
+					}
+				}else if(e.keyCode==40){
+					//bas
+					//actualY = (posY+1)*tailleCase
+					if(checkWalk(posX,posY+1)){
+						avatarPosition(posX,posY+1)
+					}
+				}else if(e.keyCode == 39){
+					//droite
+					
+					newX = (posX+1) * tailleCase
+					if(checkWalk(posX+1,posY)){
+						/*avatar.css("left",newX+"px")
+						avatar.attr("posX",posX+1)*/
+						avatarPosition(posX+1,posY)
+					}
+				}else if(e.keyCode == 37){
+					//gauche
+					newX=(posX-1) * tailleCase
+					if(checkWalk(posX-1,posY)){
+						/*avatar.css("left",newX+"px")
+						avatar.attr("posX",posX-1)*/
+						avatarPosition(posX-1,posY)
+					}
 				}
-			}else if(e.keyCode == 40){
-				//bas
-				//actualY = (posY+1)*tailleCase
-				if(checkWalk(posX,posY+1)){
-					avatarPosition(posX,posY+1)
-				}
-			}else if(e.keyCode == 39){
-				//droite
-				
-				newX = (posX+1) * tailleCase
-				if(checkWalk(posX+1,posY)){
-					/*avatar.css("left",newX+"px")
-					avatar.attr("posX",posX+1)*/
-					avatarPosition(posX+1,posY)
-				}
-			}else if(e.keyCode == 37){
-				//gauche
-				newX=(posX-1) * tailleCase
-				if(checkWalk(posX-1,posY)){
-					/*avatar.css("left",newX+"px")
-					avatar.attr("posX",posX-1)*/
-					avatarPosition(posX-1,posY)
-				}
+				posY = parseInt(avatar.attr("posY"))
+				posX = parseInt(avatar.attr("posX"))
+				checkEncounter(posX,posY)
+				checkTrigger(posX,posY)
 			}
-			posY = parseInt(avatar.attr("posY"))
-			posX = parseInt(avatar.attr("posX"))
-			checkEncounter(posX,posY)
-			checkTrigger(posX,posY)
 		}
 	})
 });
@@ -68,6 +70,7 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 			avatar.css("top",(y*tailleCase)+"px")
 			avatar.attr("posX",x)
 			avatar.attr("posY",y)
+			console.log($("#avatar"))
 		}
 	}
 	
@@ -87,18 +90,7 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 		}
 	}
 	
-	/**
-	 * Met a jour les infos du joueur dans le back
-	 * @returns
-	 */
-	function updatePlayerInfos(){
-		console.log("updating")
-		$.ajax({
-			type:'POST',
-			url:'player/posupdate',
-			data:{'y':parseInt($("#avatar").attr("posY")),'x':parseInt($("#avatar").attr("posX")),'scene' : scene.id,'localisation':scene.type}
-		})
-	}
+
 	
 	/**
 	 * Lance l'affichage de la liste de selection du monstre avant un combat
@@ -191,11 +183,30 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 			url:'player/infosTest',
 			success: function(resp){
 				data = JSON.parse(resp)
-				console.log(data)
-				posX = data.position[0]
-				posY = data.position[1]
-				avatarPosition(posX,posY)
+				console.log("update position : "+data.idScene+" | "+scene.id)
+				if(data.idScene != scene.id){
+					avatarPosition(scene.startpos[0],scene.startpos[1])
+					updatePlayerInfos()
+				}else{
+					posX = data.position[0]
+					posY = data.position[1]
+					avatarPosition(posX,posY)
+				}
+				updatePlayerView()
 			}
+		})
+	}
+	
+	/**
+	 * Met a jour les infos du joueur dans le back
+	 * @returns
+	 */
+	function updatePlayerInfos(){
+		console.log("updating")
+		$.ajax({
+			type:'POST',
+			url:'player/posupdate',
+			data:{'y':parseInt($("#avatar").attr("posY")),'x':parseInt($("#avatar").attr("posX")),'scene' : scene.id,'localisation':scene.type}
 		})
 	}
 	
@@ -204,19 +215,27 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 	 * @returns
 	 */
 	function updatePlayerView(){
-		$("#playerInfos").empty()
+		console.log("update view of player")
 		$.ajax({
 			type:"GET",
 			url:'player/infosTest',
 			success: function(resp){
 				data = JSON.parse(resp)
-				list = $("<div class='list-group'></div>")
+				$("#playerInfos").empty()
+				list = $("<div class='row font-mine align-items-start' style='height:400px;background-color:#eaeaea;padding:5px; margin-right:5px; border-radius:5px;border:black 2px solid' ></div>")
+				itemContainer = $("<div class='col-6'></div>")
+				itemContainer.append("<h5>Equipe</h5>")
 				$.each(data.equipePlayer,function(idx){
 					monstre = data.equipePlayer[idx]
-					item = $("<span class='list-group-item'></span>")
-					item.text(monstre.nom)
-					list.append(item)
+					
+					item = $("<span class='list-group-item dialog-box'></span>")
+					item.css({"box-shadow":"black 2px 0px","margin-bottom":"2px"})
+					item.text(monstre.nom+" [lvl : "+monstre.level+"]")
+					itemContainer.append(item)
+					
 				})
+				
+				list.append(itemContainer)
 				$("#playerInfos").append(list)
 			}
 		})
@@ -240,16 +259,17 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 			success:function(resp){
 				data = JSON.parse(resp)
 				//console.log(scene.id+" : "+data.idScene)
-				if(scene.id != data.idScene){
+				//if(scene.id != data.idScene){
 					//console.log("onUpdate boiii")
-					posX = scene.startpos[0]
-					posY = scene.startpos[1]
-					avatarPosition(posX,posY)
-					updatePlayerInfos()
-				}else{
+
+					updatePlayer()
+					//updatePlayerInfos()
+
+					
+				//}else{
 					//console.log("moving boiii")
-					updatePlayerInfos()
-				}
+					//updatePlayerInfos()
+				//}
 			}
 		});
 	}
@@ -275,22 +295,28 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 				success:function(resp){
 					data = JSON.parse(resp)
 					console.log(scene.id+" : "+data.idScene)
-					if(scene.id != data.idScene){
-						//console.log("onUpdate boiii")
-						updatePlayerInfos()
-						posX = scene.startpos[0]
+					//if(scene.id != data.idScene){
+						/*posX = scene.startpos[0]
 						posY = scene.startpos[1]
-						avatarPosition(posX,posY)
-					}else{
+						avatarPosition(posX,posY)*/
+						updatePlayer()
+						//updatePlayerInfos()
+						
+					//}else{
 						//console.log("moving boiii")
-						updatePlayerInfos()
-					}
+						//updatePlayerInfos()
+					//}
 				}
 			});
 		}
 	}
 	
+	/**
+	 * Rafraichit la scene avec les infos de l'objet scene
+	 * @returns
+	 */
 	function sceneSetup(){
+		console.log(scene)
 		$("#scene").css("background-image","url("+scene.background+")")
 		$("#scene").css("background-color","none")
 		setTriggersTiles()
@@ -298,6 +324,7 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 			console.log("cette scene execute un script")
 			$.getScript(scene.script)
 		}
+		updatePlayerView()
 	}
 	
 	function setTriggersTiles(){
@@ -329,7 +356,7 @@ var starterSelected = false; // je sais pas si c'est vraiment le top de la mettr
 		}
 		
 		if(scene.triggers.interact.length > 0){
-			console.log("pop dresseur")
+			
 			interactions = scene.triggers.interact
 
 			$.each(interactions,function(idx){

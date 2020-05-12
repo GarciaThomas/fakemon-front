@@ -210,12 +210,12 @@ public class Combat {
 				int atkId = m1.choixAttaqueBOT(m2,ctx).getId();
 				Action act = m1.combat(m2,atkId,ctx);
 				m2 = act.getM();
-				act.append(m2.getPv()+" restant");
 				sb.append("\"playerTurn\":true");
 				sb.append(",\"endFight\":"+false+",\"msg\": \""+act.getMessage()+"\"");
 			} catch (PVException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.out.println("taille equipe joueur : "+player.getEquipePlayer().size());
 				if(player.checkEquipeJoueur()) {
 					sb.append("\"playerTurn\":true");
 					sb.append(",\"endFight\":"+false+",\"msg\": \""+m2.getNom()+" est K.O !\"");

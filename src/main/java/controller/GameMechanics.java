@@ -61,7 +61,7 @@ public class GameMechanics {
 		String interaction2 = "[]";
 		String goAilleurs2 = "[{\"pos\" : [5,0],\"orientation\" : \"north\",\"id\" : 1}]";
 		String style2 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
-		String scene2 = "{\"type\" : \"arena\",\"script\" : \"assets/js/arene.js\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [9,5], \"background\" : \"assets/img/fondScene.png\"}";
+		String scene2 = "{\"type\" : \"arena\",\"script\" : \"assets/js/arene.js\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [5,0], \"background\" : \"assets/img/fondScene.png\"}";
 
 		scenes.add(scene0);
 		scenes.add(scene1);
@@ -97,7 +97,7 @@ public class GameMechanics {
 		String interaction2 = "[]";
 		String goAilleurs2 = "[{\"pos\" : [5,0],\"orientation\" : \"north\",\"id\" : 1}]";
 		String style2 = "{\"portail\" : \"assets/img/peronIndoor.png\"}";
-		String scene2 = "{\"script\" : \"assets/js/arene.js\",\"type\":\"arena\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [9,5], \"background\" : \"assets/img/fondScene.png\"}";
+		String scene2 = "{\"script\" : \"assets/js/arene.js\",\"type\":\"arena\",\"style\" :"+style2+",\"id\" : 3, \"nowalk\" : {\"4\":[0,1,2,3,4,5,6,7]}, \"triggers\" : {\"encounter\":[],\"interact\" : "+interaction2+",\"scenes\" : "+goAilleurs2+"}, \"startpos\" : [5,0], \"background\" : \"assets/img/fondScene.png\"}";
 
 		scenes.add(scene0);
 		scenes.add(scene1);
@@ -114,7 +114,7 @@ public class GameMechanics {
 	public void generateArena(HttpServletRequest request) {
 		LinkedList<Dresseur> arene = new LinkedList<Dresseur>();
 		System.out.println("genere une arene");
-		for(int i =0; i<3;i++) {
+		for(int i =0; i<1;i++) {
 			arene.add(new Dresseur(i, player));
 		}
 		
@@ -131,26 +131,31 @@ public class GameMechanics {
 		System.out.println(request.getSession().getAttribute("dresseur"));
 		System.out.println(request.getSession().getAttribute("dresseur") == null);
 		if(!ctx.getArene().isEmpty()) {
-			if(request.getSession().getAttribute("dresseur") == null) {
+			if(request.getSession().getAttribute("dresseur") == null || ((String)request.getSession().getAttribute("dresseur")).length() <= 0) {
+				System.out.println("Il reste des dresseur, setting attribut");
+				System.out.println((String)request.getSession().getAttribute("dresseur"));
 				Dresseur d = ctx.getArene().peek();
 				request.getSession().setAttribute("dresseur", d.getUniqueId().toString());
 				request.getSession().setAttribute("adversaire", d.getEquipeDresseur().peek());
 				dresseur = "{\"pos\" : [5,9],\"event_type\" : \"dresseur\"}";
 			}else {
-				
+				System.out.println("Il reste des dresseur, attribut deja set");
 				ctx.getArene().forEach(d -> System.out.println(d.getNom()+" : "+d.getUniqueId()));
+				System.out.println((String)request.getSession().getAttribute("dresseur"));
 				Dresseur dres = ctx.getArene().stream().filter(d -> d.getUniqueId().toString().equals((String)request.getSession().getAttribute("dresseur"))).findFirst().get();
 				System.out.println("nom : "+dres.getNom());
 				if(!dres.checkEquipeDresseur() && dres.getEquipeDresseur().size() == 0) {
+					System.out.println("All check pass");
 					ctx.getArene().remove(dres);
-					if(ctx.getArene().size() > 0) {
-						request.getSession().setAttribute("dresseur", ctx.getArene().peek().getUniqueId().toString());
-						request.getSession().setAttribute("adversaire", ctx.getArene().peek().getEquipeDresseur().peek());
-						dresseur = "{\"pos\" : [5,9],\"event_type\" : \"dresseur\"}";
-					}
+				}
+				if(ctx.getArene().size() > 0) {
+					request.getSession().setAttribute("dresseur", ctx.getArene().peek().getUniqueId().toString());
+					request.getSession().setAttribute("adversaire", ctx.getArene().peek().getEquipeDresseur().peek());
+					dresseur = "{\"pos\" : [5,9],\"event_type\" : \"dresseur\"}";
 				}
 			}
 		}
+		System.out.println(dresseur);
 		return dresseur;
 	}
 	

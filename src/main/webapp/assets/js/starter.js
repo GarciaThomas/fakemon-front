@@ -7,6 +7,7 @@
 avatarMove = false;
 
 starter = {}
+
 if(!starterSelected){
 	starterPop()
 }else{
@@ -38,9 +39,11 @@ function yes(){
 		type:'POST',
 		url:'player/starter/'+starter.uniqueId
 	})
+	
 	$('#boiteMsg').empty()
 	$('#boiteMsg').css("display",'none')
 	avatarMove=true;
+	updatePlayerView()
 }
 
 function no(){

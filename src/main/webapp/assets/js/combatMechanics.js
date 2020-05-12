@@ -14,6 +14,10 @@ $(document).ready(function(){
 	
 	function setupMonsters(){
 		
+		if(scene.type=="arena"){
+			$("#btnCapture").attr('disabled',true)
+		}
+		
 		$.ajax({
 			type:'GET',
 			url: 'combat/setup',
@@ -150,7 +154,7 @@ $(document).ready(function(){
 			url:'player/squad',
 			success: function(resp){
 				data = JSON.parse(resp)
-				listBody = $('<div style="position:absolute; z-index:0; top:50%,left:50%"></div>')
+				listBody = $('<div style="background-color:white;position:absolute; z-index:0; top:50%,left:50%;border-left:1px solid black;border-top: black 1px solid;border-radius:5px;margin-top:2px; box-shadow: 2px 2px"></div>')
 				$.each(data,function(k,v){
 					listItem = $('<div class="row"></div>')
 					listItemContent = $('<button class="btn btn-link"></button>')
@@ -183,14 +187,6 @@ $(document).ready(function(){
 	}
 	
 	function moveToIndex(){
-		/*$.ajax({
-			method:"GET",
-			url:"scene",
-			success:function(resp){
-				elem = $(resp).find("#scene")
-				$("#scene").html(elem.html())
-			}
-		})*/
 		window.location.href="scene"
 	}
 	
@@ -221,5 +217,5 @@ $(document).ready(function(){
 	
 	function toasty(){
 		$("#toastyAudio").get(0).play()
-		$("#toastyJordan").addClass("toast-it")
+		//$("#toastyJordan").addClass("toast-it")
 	}
